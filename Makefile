@@ -1,3 +1,5 @@
+install:
+	npm ci
 build:
 	rm -rf frontend/build
 	make install
@@ -8,6 +10,3 @@ start-backend:
 
 start:
 	make start-backend
-
-install:
-	npm ci

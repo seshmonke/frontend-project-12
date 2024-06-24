@@ -1,5 +1,5 @@
-build:
-	npm install
-	npm build
 install:
 	npm ci
+build:
+	make install
+	npm build
