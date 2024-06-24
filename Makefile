@@ -5,9 +5,6 @@ build:
 	make install & make -C frontend install 
 	npm run build
 
-start-backend:
-	npx start-server
-
 start:
-	make start-backend
-	npm run start --prefix frontend
+	npx start-server -s ./frontend/build
+	npm start --prefix frontend
