@@ -1,3 +1,5 @@
 build:
-	npm ci
+	npm install
 	npm build
+install:
+	npm ci
