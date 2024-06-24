@@ -10,3 +10,4 @@ start-backend:
 
 start:
 	make start-backend
+	npm run start --prefix frontend
