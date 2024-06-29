@@ -1,15 +1,15 @@
 import logo from './logo.svg';
 import './App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import 
+import { NotFoundPage } from './components/NotFoundPage';
+import { AuthPage } from './components/LoginPage';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="*" element={}></Route>
-        <Route path="" element={}></Route>
-        <Route path="login" element={}></Route>
+        <Route path="*" element={NotFoundPage}></Route>
+        <Route path="login" element={AuthPage}></Route>
       </Routes>
     </BrowserRouter>
   );

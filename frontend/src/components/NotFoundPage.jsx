@@ -1,3 +1,6 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+
 const NotFoundPage = () => {
     return (
         <div class="text-center">
@@ -9,7 +12,7 @@ const NotFoundPage = () => {
             <h1 class="h4 text-muted">Страница не найдена</h1>
             <p>
                 "Но вы можете перейти "
-                <a href="">на главную страницу</a>
+                <Link to="/">на главную страницу</Link>
             </p>
         </div>
     );
