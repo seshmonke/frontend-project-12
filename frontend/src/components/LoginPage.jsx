@@ -17,7 +17,7 @@ const LoginForm = () => {
             id="username"
             className="form-control"
           />
-          <label htmlFor="username"></label>
+          <label htmlFor="username">Ваш ник</label>
         </div>
         <div className="form-floating mb-3">
           <Field
