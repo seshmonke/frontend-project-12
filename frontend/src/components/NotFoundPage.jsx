@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import notFoundImage from "./notFoundImage.png";
 
 const NotFoundPage = () => {
     return (
         <div class="text-center">
             <img
-                src="../../public/images/404.svg"
+                src={notFoundImage}
                 alt="Страница не найдена"
                 class="img-fluid h-25"
             />
@@ -16,6 +17,6 @@ const NotFoundPage = () => {
             </p>
         </div>
     );
-} 
+}
 
 export { NotFoundPage };

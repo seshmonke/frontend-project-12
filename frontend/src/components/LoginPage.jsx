@@ -1,5 +1,6 @@
 import React from "react";
 import { Formik, Field } from "formik";
+import loginImage from './loginImage.png'
 
 const LoginForm = () => {
   return (
@@ -13,7 +14,6 @@ const LoginForm = () => {
             autocomplete="username"
             placeholder="Ваш ник"
             required
-            value
             id="username"
             className="form-control"
           />
@@ -26,7 +26,6 @@ const LoginForm = () => {
             autocomplete="username"
             placeholder="Пароль"
             required
-            value
             id="username"
             className="form-control"
           />
@@ -41,30 +40,32 @@ const LoginForm = () => {
 };
 
 const AuthPage = () => {
-  <div class="container-fluid h-100">
-    <div className="row justify-content-center align-content-center h-100">
-      <div className="col-12 col-md-8 col-xxl-6">
-        <div className="card shadow-sm">
-          <div className="card-body row p-5">
-            <div className="col-12 col-md-6 d-flex align-items-center justify-content-center">
-              <img
-                src="../../public/images/loginimg.jfif"
-                alt="Войти"
-                className="rounded-circle"
-              />
+  return (
+    <div class="container-fluid h-100">
+      <div className="row justify-content-center align-content-center h-100">
+        <div className="col-12 col-md-8 col-xxl-6">
+          <div className="card shadow-sm">
+            <div className="card-body row p-5">
+              <div className="col-12 col-md-6 d-flex align-items-center justify-content-center">
+                <img
+                  src={loginImage}
+                  alt="Войти"
+                  className="rounded-circle img-fluid smaller-image"
+                />
+              </div>
+              <LoginForm />
             </div>
-            <LoginForm />
-          </div>
-          <div className="card-footer p-4">
-            <div className="text-center">
-                <span>Нет Аккаунта?</span>
-                <a href="/signup"> Регистрация</a>
+            <div className="card-footer p-4">
+              <div className="text-center">
+                <span>Нет Аккаунта? </span>
+                <a href="/signup">Регистрация</a>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>;
+  );
 };
 
 export { AuthPage };

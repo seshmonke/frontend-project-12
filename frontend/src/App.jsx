@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { NotFoundPage } from './components/NotFoundPage';
@@ -8,8 +7,9 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="*" element={NotFoundPage}></Route>
-        <Route path="login" element={AuthPage}></Route>
+        <Route path="*" element={<NotFoundPage />}></Route>
+        <Route path="login" element={<AuthPage />}></Route>
+        <Route path="/" element={<AuthPage />}></Route>
       </Routes>
     </BrowserRouter>
   );
