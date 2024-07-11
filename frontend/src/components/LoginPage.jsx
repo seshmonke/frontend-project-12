@@ -1,11 +1,21 @@
 import React from "react";
-import { Formik, Field } from "formik";
-import loginImage from './loginImage.png'
+import { Formik, Field, Form as FormikForm } from "formik";
+import loginImage from './loginImage.png';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import axios from 'axios';
+
 
 const LoginForm = () => {
+  const handleSubmit = (values, actions) => {
+    console.log(values, actions);
+  }
+
   return (
-    <Formik initialValues={{ email: "", password: "" }}>
-      <form className="col-12 col-md-6 mt-3 mt-mb-0">
+    <Formik initialValues={{ email: "", password: "" }}
+      onSubmit={handleSubmit}
+    >
+      <FormikForm as={Form} className="col-12 col-md-6 mt-3 mt-mb-0">
         <h1 className="text-center-mb-4">Войти</h1>
         <div className="form-floating mb-3">
           <Field
@@ -31,10 +41,10 @@ const LoginForm = () => {
           />
           <label for="password">Пароль</label>
         </div>
-        <button type="submit" className="w-100 mb-3 btn btn-outline-primary">
+        <Button variant="primary" type="submit" className="w-100 mb-3">
           Войти
-        </button>
-      </form>
+        </Button>
+      </FormikForm>
     </Formik>
   );
 };
