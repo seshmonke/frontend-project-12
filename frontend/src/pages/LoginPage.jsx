@@ -1,21 +1,31 @@
 import React from "react";
-import { Formik, Field, Form as FormikForm } from "formik";
-import loginImage from './loginImage.png';
+import { redirect } from "react-router-dom";
+import { Formik, Field, Form } from "formik";
+import loginImage from '../assets/loginImage.png';
 import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
 import axios from 'axios';
 
-
 const LoginForm = () => {
-  const handleSubmit = (values, actions) => {
-    console.log(values, actions);
+  const handleSubmit = async (values, { resetForm, isSubmitting }) => {
+    try {
+      console.log(values);
+      const response = await axios.post('/api/v1/login', values);
+      const { data } = response;
+      resetForm();
+      window.localStorage.setItem(data.username, data.token);
+      redirect("/");
+      console.log('getItem', window.localStorage.getItem('admin'));
+      console.log('response', response, 'isSubmitting', isSubmitting);
+    } catch (e) {
+      console.log('error', e);
+    }
   }
 
   return (
-    <Formik initialValues={{ email: "", password: "" }}
+    <Formik initialValues={{ username: "", password: "" }}
       onSubmit={handleSubmit}
     >
-      <FormikForm as={Form} className="col-12 col-md-6 mt-3 mt-mb-0">
+      <Form className="col-12 col-md-6 mt-3 mt-mb-0">
         <h1 className="text-center-mb-4">Войти</h1>
         <div className="form-floating mb-3">
           <Field
@@ -36,7 +46,7 @@ const LoginForm = () => {
             autocomplete="username"
             placeholder="Пароль"
             required
-            id="username"
+            id="password"
             className="form-control"
           />
           <label for="password">Пароль</label>
@@ -44,7 +54,7 @@ const LoginForm = () => {
         <Button variant="primary" type="submit" className="w-100 mb-3">
           Войти
         </Button>
-      </FormikForm>
+      </Form>
     </Formik>
   );
 };
