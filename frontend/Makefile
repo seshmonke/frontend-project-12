@@ -1,6 +1,6 @@
 build:
 	npm ci
-	npm run build
+	vite build
 
 start:
 	npx start-server &
