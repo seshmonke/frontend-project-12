@@ -3,4 +3,7 @@ build:
 	npm run build
 
 start:
-	npm start &
+	npm start
+
+install:
+	npm ci
