@@ -3,7 +3,7 @@ build:
 	vite build
 
 start:
-	npx start-server &
+	npx start-server
 
 install:
 	npm ci
