@@ -13,7 +13,7 @@ const NotFoundPage = () => {
             <h1 className="h4 text-muted">Страница не найдена</h1>
             <p>
                 Но вы можете перейти
-                <Link to="/">на главную страницу</Link>
+                <Link to="/"> на главную страницу</Link>
             </p>
         </div>
     );
