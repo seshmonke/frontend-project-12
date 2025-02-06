@@ -1,28 +1,29 @@
 import React from "react";
 import { redirect } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
-import loginImage from '../../assets/loginImage.png';
-import Button from 'react-bootstrap/Button';
-import axios from 'axios';
+import loginImage from "../../assets/loginImage.png";
+import { Button, Image } from "react-bootstrap";
+import axios from "axios";
 
 const LoginForm = () => {
   const handleSubmit = async (values, { resetForm, isSubmitting }) => {
     try {
       console.log(values);
-      const response = await axios.post('/api/v1/login', values);
+      const response = await axios.post("/api/v1/login", values);
       const { data } = response;
       resetForm();
       window.localStorage.setItem(data.username, data.token);
       redirect("/");
-      console.log('getItem', window.localStorage.getItem('admin'));
-      console.log('response', response, 'isSubmitting', isSubmitting);
+      console.log("getItem", window.localStorage.getItem("admin"));
+      console.log("response", response, "isSubmitting", isSubmitting);
     } catch (e) {
-      console.log('error', e);
+      console.log("error", e);
     }
-  }
+  };
 
   return (
-    <Formik initialValues={{ username: "", password: "" }}
+    <Formik
+      initialValues={{ username: "", password: "" }}
       onSubmit={handleSubmit}
     >
       <Form className="col-12 col-md-6 mt-3 mt-mb-0">
@@ -61,6 +62,25 @@ const LoginForm = () => {
 
 const LoginPage = () => {
   return (
+    <div>
+      <Image
+        src={ loginImage }
+        alt="Войти"
+        rounded-circle
+        fluid
+        className="w-25"
+      />
+
+      <LoginForm />
+
+      <span>Нет Аккаунта? </span>
+
+      <a href="/signup">Регистрация</a>
+    </div>
+  );
+
+  /*
+  return (
     <div className="container-fluid h-100">
       <div className="row justify-content-center align-content-center h-100">
         <div className="col-12 col-md-8 col-xxl-6">
@@ -86,6 +106,7 @@ const LoginPage = () => {
       </div>
     </div>
   );
+  */
 };
 
 export { LoginPage };
