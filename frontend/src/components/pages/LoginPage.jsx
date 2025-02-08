@@ -7,6 +7,7 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
+import { Form as BootstrapForm } from "react-bootstrap";
 import axios from "axios";
 
 const LoginForm = () => {
@@ -25,7 +26,7 @@ const LoginForm = () => {
       console.log("response", response, "isSubmitting", isSubmitting);
     } catch (e) {
       console.log("error", e);
-      e.response ? setAuthError(e.response.data.message || "Ошибка авторизации") : setAuthError("Произошла ошибка. Попробуйте снова.");
+      e.response ? setAuthError("Неверные имя пользователя или пароль") : setAuthError("Произошла ошибка. Попробуйте снова.");
     } finally {
       isSubmitting(false);
     }
@@ -37,7 +38,7 @@ const LoginForm = () => {
       onSubmit={handleSubmit}
     >
       <Form className="col-12 col-md-6 mt-3 mt-mb-0">
-        <h1 className="text-center-mb-4">Войти</h1>
+        <h1 className="text-center mb-4">Войти</h1>
         <div className="form-floating mb-3">
           <Field
             type="text"
@@ -61,6 +62,9 @@ const LoginForm = () => {
             className={`form-control ${authError && 'is-invalid'}`}
           />
           <label htmlFor="password">Пароль</label>
+          <BootstrapForm.Control.Feedback type="invalid">
+            {authError}
+          </BootstrapForm.Control.Feedback>
         </div>
         <Button variant="primary" type="submit" className="w-100 mb-3">
           Войти
@@ -78,7 +82,7 @@ const FormCard = () => {
           <img
             src={loginImage}
             alt="Войти"
-            className="rounded-circle img-fluid col-6"
+            className="rounded-circle h-50"
           />
         </div>
         <LoginForm />
