@@ -3,7 +3,7 @@ import authReducer from './authSlice.js';
 
 export default configureStore({
     reducer: {
-        counter: authReducer,
+        auth: authReducer,
     }
 });
 

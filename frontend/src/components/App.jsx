@@ -8,12 +8,12 @@ import {
 } from "react-router-dom";
 import { NotFoundPage } from "./pages/NotFoundPage.jsx";
 import { LoginPage } from "./pages/LoginPage.jsx";
+import { MainPage } from "./pages/MainPage.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
 import AuthContext from "../contexts/index.jsx";
-import useAuth from '../hooks/index.jsx';
-
+import useAuth from "../hooks/index.jsx";
 
 const AuthProvider = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -33,18 +33,12 @@ const AuthProvider = ({ children }) => {
 const PrivateRoute = ({ children }) => {
   const auth = useAuth();
   const location = useLocation();
-
+  console.log('Приватный путь работает!', 'auth: ', auth, "location: ", location);
   return auth.loggedIn ? (
     children
   ) : (
     <Navigate to="/login" state={{ from: location }} />
   );
-};
-
-const PrivatePage = () => {
-  return (
-    <div>Private</div>
-  )
 };
 
 const App = () => {
@@ -59,11 +53,14 @@ const App = () => {
 
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={(
-              <PrivateRoute>
-                <PrivatePage />
-              </PrivateRoute>
-            )} />
+            <Route
+              path="/"
+              element={
+                <PrivateRoute>
+                  <MainPage />
+                </PrivateRoute>
+              }
+            />
             <Route path="/login" element={<LoginPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

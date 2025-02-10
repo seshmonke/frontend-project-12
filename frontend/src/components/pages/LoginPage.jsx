@@ -13,8 +13,10 @@ import {
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { setCredentials } from "../../slices/authSlice.js";
+import useAuth from "../../hooks/index.jsx";
 
 const LoginForm = () => {
+  const { loggedIn, logIn, logOut } = useAuth();
   const navigate = useNavigate();
   const [authError, setAuthError] = useState(null);
   const dispatch = useDispatch();
@@ -29,10 +31,9 @@ const LoginForm = () => {
       const { data } = response;
       resetForm();
       window.localStorage.setItem("userId", JSON.stringify(data));
-      dispatch(
-        setCredentials(JSON.parse(window.localStorage.getItem("userId")))
-      );
+      dispatch(setCredentials(JSON.parse(window.localStorage.getItem("userId"))));
       setAuthError(null);
+      logIn();
       navigate("/");
       console.log("getItem", window.localStorage.getItem("admin"));
       console.log("response", response, "isSubmitting", isSubmitting);
@@ -41,8 +42,6 @@ const LoginForm = () => {
       e.response
         ? setAuthError("Неверные имя пользователя или пароль")
         : setAuthError("Произошла ошибка. Попробуйте снова.");
-    } finally {
-      isSubmitting(false);
     }
   };
 
