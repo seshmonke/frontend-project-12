@@ -1,32 +1,46 @@
-import React, { useState }  from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
 import loginImage from "../../assets/loginImage.png";
-import { Button } from "react-bootstrap";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Card from "react-bootstrap/Card";
-import { Form as BootstrapForm } from "react-bootstrap";
+import {
+  Button,
+  Container,
+  Row,
+  Col,
+  Card,
+  Form as BootstrapForm,
+} from "react-bootstrap";
 import axios from "axios";
+import { useSelector, useDispatch } from "react-redux";
+import { setCredentials } from "../../slices/authSlice.js";
 
 const LoginForm = () => {
   const navigate = useNavigate();
   const [authError, setAuthError] = useState(null);
+  const dispatch = useDispatch();
+  const userData = useSelector((state) => { 
+    console.log("СОСТЯНИЕ СЛАЙСА: ", state);
+    return state.auth
+  });
   const handleSubmit = async (values, { resetForm, isSubmitting }) => {
     try {
       console.log(values);
       const response = await axios.post("/api/v1/login", values);
       const { data } = response;
       resetForm();
-      window.localStorage.setItem('userId', JSON.stringify(data));
+      window.localStorage.setItem("userId", JSON.stringify(data));
+      dispatch(
+        setCredentials(JSON.parse(window.localStorage.getItem("userId")))
+      );
       setAuthError(null);
       navigate("/");
       console.log("getItem", window.localStorage.getItem("admin"));
       console.log("response", response, "isSubmitting", isSubmitting);
     } catch (e) {
       console.log("error", e);
-      e.response ? setAuthError("Неверные имя пользователя или пароль") : setAuthError("Произошла ошибка. Попробуйте снова.");
+      e.response
+        ? setAuthError("Неверные имя пользователя или пароль")
+        : setAuthError("Произошла ошибка. Попробуйте снова.");
     } finally {
       isSubmitting(false);
     }
@@ -47,7 +61,7 @@ const LoginForm = () => {
             placeholder="Ваш ник"
             required
             id="username"
-            className={`form-control ${authError && 'is-invalid'}`}
+            className={`form-control ${authError && "is-invalid"}`}
           />
           <label htmlFor="username">Ваш ник</label>
         </div>
@@ -59,7 +73,7 @@ const LoginForm = () => {
             placeholder="Пароль"
             required
             id="password"
-            className={`form-control ${authError && 'is-invalid'}`}
+            className={`form-control ${authError && "is-invalid"}`}
           />
           <label htmlFor="password">Пароль</label>
           <BootstrapForm.Control.Feedback type="invalid">
@@ -79,11 +93,7 @@ const FormCard = () => {
     <Card className="shadow-sm">
       <Card.Body className="row">
         <div className="col-12 col-md-6 d-flex align-items-center justify-content-center">
-          <img
-            src={loginImage}
-            alt="Войти"
-            className="rounded-circle h-50"
-          />
+          <img src={loginImage} alt="Войти" className="rounded-circle h-50" />
         </div>
         <LoginForm />
       </Card.Body>

@@ -14,6 +14,7 @@ import Navbar from "react-bootstrap/Navbar";
 import AuthContext from "../contexts/index.jsx";
 import useAuth from '../hooks/index.jsx';
 
+
 const AuthProvider = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState(false);
   const logIn = () => setLoggedIn(true);
