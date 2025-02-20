@@ -20,10 +20,12 @@ const LoginForm = () => {
   const navigate = useNavigate();
   const [authError, setAuthError] = useState(null);
   const dispatch = useDispatch();
+  
   const userData = useSelector((state) => { 
     console.log("СОСТЯНИЕ СЛАЙСА: ", state);
     return state.auth
   });
+
   const handleSubmit = async (values, { resetForm, isSubmitting }) => {
     try {
       console.log(values);
@@ -32,10 +34,11 @@ const LoginForm = () => {
       resetForm();
       window.localStorage.setItem("userId", JSON.stringify(data));
       dispatch(setCredentials(JSON.parse(window.localStorage.getItem("userId"))));
+      
       setAuthError(null);
       logIn();
       navigate("/");
-      console.log("getItem", window.localStorage.getItem("admin"));
+      console.log("getItem", window.localStorage.getItem("userId"));
       console.log("response", response, "isSubmitting", isSubmitting);
     } catch (e) {
       console.log("error", e);

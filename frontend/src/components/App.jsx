@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -33,10 +33,25 @@ const AuthProvider = ({ children }) => {
 const PrivateRoute = ({ children }) => {
   const auth = useAuth();
   const location = useLocation();
-  console.log('Приватный путь работает!', 'auth: ', auth, "location: ", location);
+  console.log(
+    "Приватный путь работает!",
+    "auth: ",
+    auth,
+    "location: ",
+    location
+  );
+
+  useEffect(() => {
+    const credentials = JSON.parse(window.localStorage.getItem("userId"));
+    console.log(credentials, !!credentials);
+    credentials.token && auth.logIn();
+    console.log('loggedIn: ', auth.loggedIn);
+  }, [auth]);
+
   return auth.loggedIn ? (
     children
   ) : (
+    
     <Navigate to="/login" state={{ from: location }} />
   );
 };
@@ -44,9 +59,9 @@ const PrivateRoute = ({ children }) => {
 const App = () => {
   return (
     <AuthProvider>
-      <Container className="bg-white h-100" fluid>
+      <div className="d-flex flex-column bg-white h-100">
         <Navbar className="bg-light-subtle shadow-sm">
-          <Container fluid>
+          <Container>
             <Navbar.Brand href="/">Sesh Chat</Navbar.Brand>
           </Container>
         </Navbar>
@@ -65,7 +80,7 @@ const App = () => {
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </BrowserRouter>
-      </Container>
+      </div>
     </AuthProvider>
   );
 };
