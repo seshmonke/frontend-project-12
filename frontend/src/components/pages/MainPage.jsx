@@ -1,6 +1,8 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import PropTypes from "prop-types";
+import { io } from "socket.io-client";
 import {
   Container,
   Row,
@@ -27,16 +29,142 @@ const MyIcon = () => {
   );
 };
 
+const Channels = ({ channels }) => {
+  console.log('channels in Channels', channels);
+  return (
+    <Nav
+      id="channels-box"
+      className="flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block"
+      as="ul"
+    >
+      {channels.map((channel, index) => {
+        return (
+          <Nav.Item className="w-100" as="li" key={index}>
+            <button
+              type="button"
+              className="w-100 rounded-0 text-start btn btn-secondary"
+            >
+              <span className="me-1">#</span> {channel.name}
+            </button>
+          </Nav.Item>
+        );
+      })}
+    </Nav>
+  );
+};
+
+Channels.propTypes = {
+  channels: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired, // Указываем, что name должен быть строкой и является обязательным
+    })
+  ).isRequired, // Указываем, что channels является обязательным массивом
+};
+
+const Messages = ({ messages }) => {
+  return (
+    <div id="messages-box" className="chat-messages overflow-auto px-5">
+      {messages.map((message, index) => {
+        return (
+          <div className="text-break mb-2" key={index}>
+            <b>{message.name}</b>:{message.content}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+
+Messages.propTypes = {
+  messages: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired, // Указываем, что name должен быть строкой и является обязательным
+      content: PropTypes.string.isRequired, // Указываем, что content должен быть строкой и является обязательным
+    })
+  ).isRequired, // Указываем, что messages является обязательным массивом
+};
+
+const MessageForm = () => {
+  const [inputValue, setInputValue] = useState("");
+  const { channels, auth, messages } = useSelector((state) => state);
+  const [errorMessage, setErrorMessage] = useState(null);
+
+  const handleSubmit = async (event) => {
+    try {
+      event.preventDefault();
+      //console.log("Submitted value:", inputValue);
+      console.log('messages in messages form: ', messages);
+      const newMessage = {
+        id: messages.length,
+        body: inputValue,
+        channelId: channels.currentChannel.id,
+        username: auth.username,
+      };
+      const response = await axios.post("/api/v1/messages", newMessage, {
+        headers: {
+          Authorization: `Bearer ${auth.token}`,
+        },
+      });
+      console.log('New message response', response);
+      setErrorMessage(null);
+    } catch (error) {
+      setErrorMessage(error);
+    }
+
+  };
+
+  return (
+    <BootstrapForm className="py-1 border rounded-2" onSubmit={handleSubmit}>
+      <BootstrapForm.Group className="input-group has-validation">
+        <BootstrapForm.Control
+          name="body"
+          aria-label="Новое сообщение"
+          placeholder="Введите сообщение..."
+          type="text"
+          className="border-0 p-0 ps-2 form-control"
+          onChange={(e) => setInputValue(e.target.value)}
+        />
+        <button className="btn btn-group-vertical">
+          <svg
+            type="submit"
+            disabled
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            width="20"
+            height="20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm4.5 5.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"
+            ></path>
+          </svg>
+          <span className="visually-hidden">Отправить</span>
+        </button>
+      </BootstrapForm.Group>
+      {errorMessage && <div className="text-danger">{errorMessage}</div>}
+    </BootstrapForm>
+  );
+};
+
 const MainPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentChannelId, setCurrentChannelId] = useState("1");
   const dispatch = useDispatch();
 
   const { auth } = useSelector((state) => state);
 
-  console.log("A. Выгрузка токена из стора", auth);
+  //console.log("A. Выгрузка токена из стора", auth);
 
   useEffect(() => {
+    const socket = io("http://localhost:5001/");
+
+    socket.on("newMessage", (payload) => {
+      //console.log(payload); // => { body: "new message", channelId: 7, id: 8, username: "admin" }
+    });
+
     const fetchData = async () => {
       try {
         const channelsResponse = await axios.get("/api/v1/channels", {
@@ -54,7 +182,6 @@ const MainPage = () => {
         dispatch(setChannels(channelsResponse.data));
         dispatch(setMessages(messagesResponse.data));
 
-        console.log("B. Ответ от сервера с данными. Каналы:", channelsResponse.data, "Сообщения: ", messagesResponse);
       } catch (error) {
         setError(error);
       } finally {
@@ -65,10 +192,13 @@ const MainPage = () => {
     fetchData();
   }, [auth, dispatch]);
 
-  const { channels } = useSelector((state) => {
-    console.log('D. Состояние о каналах из стора', state);
+  const { channels, messages } = useSelector((state) => {
+    console.log("D. Состояние из стора", state);
     return state;
   });
+
+  const currentChannel = useSelector(({ channels }) => channels.currentChannel);
+  const currentChannelName = currentChannel ? currentChannel.name : 'Канал не выбран';
 
   return (
     <Container className="h-100 my-4 overflow-hidden rounded shadow">
@@ -81,61 +211,22 @@ const MainPage = () => {
               <span className="visually-hidden">+</span>
             </button>
           </div>
-          <Nav
-            id="channels-box"
-            className="flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100"
-          >
-            <Nav.Item className="w-100">
-              <Button
-                type="button"
-                className="w-100 rounded-0 text-start btn btn-secondary"
-              >
-                <span className="me-1">#</span>general
-              </Button>
-            </Nav.Item>
-          </Nav>
+
+          <Channels channels={channels.list} />
         </Col>
         <Col className="p-0 h-100 ">
           <div className="d-flex flex-column h-100">
             <div className="bg-light mb-4 p-3 shadow-sm small">
               <p className="m-0">
-                <b># general</b>
+                <b># {currentChannelName}</b>
               </p>
               <span className="text-muted">0 сообщений</span>
             </div>
-            <div
-              id="messages-box"
-              className="vhat-messages overflow-auto px-5"
-            ></div>
+
+            <Messages messages={messages} />
+
             <div className="mt-auto px-5 py-3">
-              <BootstrapForm className="py-1 border rounded-2">
-                <BootstrapForm.Group className="input-group has-validation">
-                  <BootstrapForm.Control
-                    name="body"
-                    aria-label="Новое сообщение"
-                    placeholder="Введите сообщение..."
-                    type="text"
-                    className="border-0 p-0 ps-2 form-control"
-                  />
-                  <button className="btn btn-group-vertical">
-                    <svg
-                      type="submit"
-                      disabled
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 16 16"
-                      width="20"
-                      height="20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm4.5 5.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"
-                      ></path>
-                    </svg>
-                    <span className="visually-hidden">Отправить</span>
-                  </button>
-                </BootstrapForm.Group>
-              </BootstrapForm>
+              <MessageForm />
             </div>
           </div>
         </Col>
