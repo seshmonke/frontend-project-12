@@ -12,7 +12,7 @@ import {
   Form as BootstrapForm,
 } from "react-bootstrap";
 import { setChannels } from "../../slices/channelsSlice.js";
-import { setMessages } from "../../slices/messagesSlice.js";
+import { setMessages, addNewMessage } from "../../slices/messagesSlice.js";
 
 const MyIcon = () => {
   return (
@@ -30,7 +30,7 @@ const MyIcon = () => {
 };
 
 const Channels = ({ channels }) => {
-  console.log('channels in Channels', channels);
+  console.log("channels in Channels", channels);
   return (
     <Nav
       id="channels-box"
@@ -62,19 +62,24 @@ Channels.propTypes = {
 };
 
 const Messages = ({ messages }) => {
+  const state = useSelector((state) => {
+    console.log("Состояние из стора в сообщениях", state);
+    return state;
+  });
+
   return (
     <div id="messages-box" className="chat-messages overflow-auto px-5">
       {messages.map((message, index) => {
+        console.log("Сообщение в динамической генерации", message);
         return (
           <div className="text-break mb-2" key={index}>
-            <b>{message.name}</b>:{message.content}
+            <b>{message.username}</b>: {message.body}
           </div>
         );
       })}
     </div>
   );
 };
-
 
 Messages.propTypes = {
   messages: PropTypes.arrayOf(
@@ -94,7 +99,7 @@ const MessageForm = () => {
     try {
       event.preventDefault();
       //console.log("Submitted value:", inputValue);
-      console.log('messages in messages form: ', messages);
+      console.log("messages in messages form: ", messages);
       const newMessage = {
         id: messages.length,
         body: inputValue,
@@ -106,12 +111,11 @@ const MessageForm = () => {
           Authorization: `Bearer ${auth.token}`,
         },
       });
-      console.log('New message response', response);
+      console.log("New message response", response);
       setErrorMessage(null);
     } catch (error) {
       setErrorMessage(error);
     }
-
   };
 
   return (
@@ -153,16 +157,14 @@ const MainPage = () => {
   const [error, setError] = useState(null);
   const [currentChannelId, setCurrentChannelId] = useState("1");
   const dispatch = useDispatch();
-
   const { auth } = useSelector((state) => state);
-
-  //console.log("A. Выгрузка токена из стора", auth);
 
   useEffect(() => {
     const socket = io("http://localhost:5001/");
 
     socket.on("newMessage", (payload) => {
       //console.log(payload); // => { body: "new message", channelId: 7, id: 8, username: "admin" }
+      dispatch(addNewMessage(payload));
     });
 
     const fetchData = async () => {
@@ -181,7 +183,6 @@ const MainPage = () => {
 
         dispatch(setChannels(channelsResponse.data));
         dispatch(setMessages(messagesResponse.data));
-
       } catch (error) {
         setError(error);
       } finally {
@@ -198,7 +199,9 @@ const MainPage = () => {
   });
 
   const currentChannel = useSelector(({ channels }) => channels.currentChannel);
-  const currentChannelName = currentChannel ? currentChannel.name : 'Канал не выбран';
+  const currentChannelName = currentChannel
+    ? currentChannel.name
+    : "Канал не выбран";
 
   return (
     <Container className="h-100 my-4 overflow-hidden rounded shadow">
