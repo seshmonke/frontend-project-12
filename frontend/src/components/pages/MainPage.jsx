@@ -164,7 +164,7 @@ const MainPage = () => {
 
     socket.on("newMessage", (payload) => {
       //console.log(payload); // => { body: "new message", channelId: 7, id: 8, username: "admin" }
-      dispatch(addNewMessage(payload));
+      //dispatch(addNewMessage(payload));
     });
 
     const fetchData = async () => {

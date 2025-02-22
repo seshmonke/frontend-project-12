@@ -16,10 +16,19 @@ import AuthContext from "../contexts/index.jsx";
 import useAuth from "../hooks/index.jsx";
 
 const AuthProvider = ({ children }) => {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(() => {
+    try {
+      const credentials = JSON.parse(window.localStorage.getItem("userId"));
+      console.log("Какой токен отпарсился: ", credentials, !!credentials);
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  });
   const logIn = () => setLoggedIn(true);
   const logOut = () => {
-    localStorage.removeItem("userid");
+    localStorage.removeItem("userId");
     setLoggedIn(false);
   };
 
@@ -41,20 +50,22 @@ const PrivateRoute = ({ children }) => {
     location
   );
 
-  useEffect(() => {
-    const credentials = JSON.parse(window.localStorage.getItem("userId"));
-    console.log(credentials, !!credentials);
-    credentials.token && auth.logIn();
-    console.log('loggedIn: ', auth.loggedIn);
-  }, [auth]);
-
   return auth.loggedIn ? (
     children
   ) : (
-    
     <Navigate to="/login" state={{ from: location }} />
   );
 };
+
+const PublicRoute = ({ children }) => {
+  const auth = useAuth();
+  const location = useLocation();
+
+  return auth.loggedIn ? (
+    <Navigate to="/" state={{ from: location }} />
+  ) : children;
+};
+
 
 const App = () => {
   return (
@@ -76,7 +87,12 @@ const App = () => {
                 </PrivateRoute>
               }
             />
-            <Route path="/login" element={<LoginPage />} />
+            <Route path="/login" element={
+              <PublicRoute>
+                <LoginPage />
+              </PublicRoute>
+            }
+            />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </BrowserRouter>
