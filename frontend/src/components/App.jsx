@@ -12,8 +12,11 @@ import { MainPage } from "./pages/MainPage.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
-import AuthContext from "../contexts/index.jsx";
-import useAuth from "../hooks/index.jsx";
+import { AuthContext } from "../contexts/index.jsx";
+import { useAuth } from "../hooks/index.jsx";
+import { setCredentials } from "../slices/authSlice.js";
+
+
 
 const AuthProvider = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState(() => {

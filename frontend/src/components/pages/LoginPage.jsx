@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
 import loginImage from "../../assets/loginImage.png";
 import {
@@ -13,7 +13,7 @@ import {
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { setCredentials } from "../../slices/authSlice.js";
-import useAuth from "../../hooks/index.jsx";
+import { useAuth } from "../../hooks/index.jsx";
 
 const LoginForm = () => {
   const { loggedIn, logIn, logOut } = useAuth();
@@ -33,7 +33,7 @@ const LoginForm = () => {
       const { data } = response;
       resetForm();
       window.localStorage.setItem("userId", JSON.stringify(data));
-      dispatch(setCredentials(JSON.parse(window.localStorage.getItem("userId"))));
+      dispatch(setCredentials(data));
       
       setAuthError(null);
       logIn();

@@ -112,6 +112,7 @@ const MessageForm = () => {
         },
       });
       console.log("New message response", response);
+      
       setErrorMessage(null);
     } catch (error) {
       setErrorMessage(error);
@@ -159,14 +160,15 @@ const MainPage = () => {
   const dispatch = useDispatch();
   const { auth } = useSelector((state) => state);
 
+  console.log('Токен перед фетчем данных', auth);
   useEffect(() => {
     const socket = io("http://localhost:5001/");
-
+    
     socket.on("newMessage", (payload) => {
       //console.log(payload); // => { body: "new message", channelId: 7, id: 8, username: "admin" }
-      //dispatch(addNewMessage(payload));
+      dispatch(addNewMessage(payload));
     });
-
+    
     const fetchData = async () => {
       try {
         const channelsResponse = await axios.get("/api/v1/channels", {
