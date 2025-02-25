@@ -12,11 +12,31 @@ import { MainPage } from "./pages/MainPage.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
-import { AuthContext } from "../contexts/index.jsx";
+import { AuthContext, SocketContext } from "../contexts/index.jsx";
 import { useAuth } from "../hooks/index.jsx";
 import { setCredentials } from "../slices/authSlice.js";
+import { initSocket } from "../api/websocket.js";
+import { useSelector } from "react-redux";
 
+const SocketProvider = ({ children }) => {
+  const auth = useSelector((state) => state.auth);
+  const [socket, setSocket] = useState(null);
+  console.log('SocketProvider', auth.token);
+  useEffect(() => {
+    console.log('Монтирование Сокет провайдера');
+    if (auth.token) {
+      const newSocket = initSocket(auth.token);
+      setSocket(newSocket);
+      console.log('Сокет в провайдере',socket);
 
+      return () => {
+        newSocket.disconnect();
+      };
+    }
+  }, [auth.token]);
+
+  return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>;
+};
 
 const AuthProvider = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState(() => {
@@ -66,40 +86,45 @@ const PublicRoute = ({ children }) => {
 
   return auth.loggedIn ? (
     <Navigate to="/" state={{ from: location }} />
-  ) : children;
+  ) : (
+    children
+  );
 };
-
 
 const App = () => {
   return (
     <AuthProvider>
-      <div className="d-flex flex-column bg-white h-100">
-        <Navbar className="bg-light-subtle shadow-sm">
-          <Container>
-            <Navbar.Brand href="/">Sesh Chat</Navbar.Brand>
-          </Container>
-        </Navbar>
+      <SocketProvider>
+        <div className="d-flex flex-column bg-white h-100">
+          <Navbar className="bg-light-subtle shadow-sm">
+            <Container>
+              <Navbar.Brand href="/">Sesh Chat</Navbar.Brand>
+            </Container>
+          </Navbar>
 
-        <BrowserRouter>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <PrivateRoute>
-                  <MainPage />
-                </PrivateRoute>
-              }
-            />
-            <Route path="/login" element={
-              <PublicRoute>
-                <LoginPage />
-              </PublicRoute>
-            }
-            />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </BrowserRouter>
-      </div>
+          <BrowserRouter>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <PrivateRoute>
+                    <MainPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/login"
+                element={
+                  <PublicRoute>
+                    <LoginPage />
+                  </PublicRoute>
+                }
+              />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </BrowserRouter>
+        </div>
+      </SocketProvider>
     </AuthProvider>
   );
 };

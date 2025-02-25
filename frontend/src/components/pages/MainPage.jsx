@@ -2,7 +2,6 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
-import { io } from "socket.io-client";
 import {
   Container,
   Row,
@@ -13,6 +12,8 @@ import {
 } from "react-bootstrap";
 import { setChannels } from "../../slices/channelsSlice.js";
 import { setMessages, addNewMessage } from "../../slices/messagesSlice.js";
+import { SocketContext } from "../../contexts/index.jsx";
+import { useSocket } from "../../hooks/index.jsx";
 
 const MyIcon = () => {
   return (
@@ -96,26 +97,28 @@ const MessageForm = () => {
   const [errorMessage, setErrorMessage] = useState(null);
 
   const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!inputValue.trim()) return;
+    const newMessage = {
+      id: messages.length,
+      body: inputValue,
+      channelId: channels.currentChannel.id,
+      username: auth.username,
+    };
+
     try {
-      event.preventDefault();
-      //console.log("Submitted value:", inputValue);
       console.log("messages in messages form: ", messages);
-      const newMessage = {
-        id: messages.length,
-        body: inputValue,
-        channelId: channels.currentChannel.id,
-        username: auth.username,
-      };
+
       const response = await axios.post("/api/v1/messages", newMessage, {
         headers: {
           Authorization: `Bearer ${auth.token}`,
         },
       });
       console.log("New message response", response);
-      
+      setInputValue("");
       setErrorMessage(null);
     } catch (error) {
-      setErrorMessage(error);
+      setErrorMessage(error.message || "Ошибка при отправке сообщения");
     }
   };
 
@@ -127,6 +130,7 @@ const MessageForm = () => {
           aria-label="Новое сообщение"
           placeholder="Введите сообщение..."
           type="text"
+          value={inputValue}
           className="border-0 p-0 ps-2 form-control"
           onChange={(e) => setInputValue(e.target.value)}
         />
@@ -160,28 +164,23 @@ const MainPage = () => {
   const dispatch = useDispatch();
   const { auth } = useSelector((state) => state);
 
-  console.log('Токен перед фетчем данных', auth);
   useEffect(() => {
-    const socket = io("http://localhost:5001/");
-    
-    socket.on("newMessage", (payload) => {
-      //console.log(payload); // => { body: "new message", channelId: 7, id: 8, username: "admin" }
-      dispatch(addNewMessage(payload));
-    });
-    
+    if (!auth.token) return;
+
     const fetchData = async () => {
       try {
-        const channelsResponse = await axios.get("/api/v1/channels", {
-          headers: {
-            Authorization: `Bearer ${auth.token}`,
-          },
-        });
-
-        const messagesResponse = await axios.get("/api/v1/messages", {
-          headers: {
-            Authorization: `Bearer ${auth.token}`,
-          },
-        });
+        const [channelsResponse, messagesResponse] = await Promise.all([
+          axios.get("/api/v1/channels", {
+            headers: {
+              Authorization: `Bearer ${auth.token}`,
+            },
+          }),
+          axios.get("/api/v1/messages", {
+            headers: {
+              Authorization: `Bearer ${auth.token}`,
+            },
+          }),
+        ]);
 
         dispatch(setChannels(channelsResponse.data));
         dispatch(setMessages(messagesResponse.data));
@@ -193,7 +192,7 @@ const MainPage = () => {
     };
 
     fetchData();
-  }, [auth, dispatch]);
+  }, [auth.token, dispatch]);
 
   const { channels, messages } = useSelector((state) => {
     console.log("D. Состояние из стора", state);
@@ -204,6 +203,9 @@ const MainPage = () => {
   const currentChannelName = currentChannel
     ? currentChannel.name
     : "Канал не выбран";
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <Container className="h-100 my-4 overflow-hidden rounded shadow">
