@@ -43,7 +43,7 @@ const AuthProvider = ({ children }) => {
     try {
       const credentials = JSON.parse(window.localStorage.getItem("userId"));
       console.log("Какой токен отпарсился: ", credentials, !!credentials);
-      return true;
+      return !!credentials;
     } catch (error) {
       console.error(error);
       return false;
@@ -82,6 +82,7 @@ const PrivateRoute = ({ children }) => {
 
 const PublicRoute = ({ children }) => {
   const auth = useAuth();
+  console.log('auth Public Route', auth);
   const location = useLocation();
 
   return auth.loggedIn ? (
@@ -94,7 +95,6 @@ const PublicRoute = ({ children }) => {
 const App = () => {
   return (
     <AuthProvider>
-      <SocketProvider>
         <div className="d-flex flex-column bg-white h-100">
           <Navbar className="bg-light-subtle shadow-sm">
             <Container>
@@ -124,7 +124,6 @@ const App = () => {
             </Routes>
           </BrowserRouter>
         </div>
-      </SocketProvider>
     </AuthProvider>
   );
 };

@@ -93,7 +93,10 @@ Messages.propTypes = {
 
 const MessageForm = () => {
   const [inputValue, setInputValue] = useState("");
-  const { channels, auth, messages } = useSelector((state) => state);
+  const { channels, auth, messages } = useSelector((state) => {
+    console.log('состояние стора в момент отправки сообщения', state);
+    return state;
+  });
   const [errorMessage, setErrorMessage] = useState(null);
 
   const handleSubmit = async (event) => {
@@ -203,9 +206,6 @@ const MainPage = () => {
   const currentChannelName = currentChannel
     ? currentChannel.name
     : "Канал не выбран";
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <Container className="h-100 my-4 overflow-hidden rounded shadow">

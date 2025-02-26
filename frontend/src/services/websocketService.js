@@ -8,6 +8,7 @@ class SocketService {
     connect(token) {
         if (this.socket) return;
 
+        console.log("Connecting to socket...");
         this.socket = io('http://localhost:5001/', {
             auth: { token },
         });

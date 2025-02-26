@@ -5,6 +5,7 @@ const socketMiddleware = (store) => {
     let token = null;
 
     return next => action => {
+        console.log("Redux action:", action);
         switch (action.type) {
             case 'auth/loginSuccess':
                 token = action.payload.token;
