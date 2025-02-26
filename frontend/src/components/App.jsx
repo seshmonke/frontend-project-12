@@ -15,28 +15,8 @@ import Navbar from "react-bootstrap/Navbar";
 import { AuthContext, SocketContext } from "../contexts/index.jsx";
 import { useAuth } from "../hooks/index.jsx";
 import { setCredentials } from "../slices/authSlice.js";
-import { initSocket } from "../api/websocket.js";
 import { useSelector } from "react-redux";
 
-const SocketProvider = ({ children }) => {
-  const auth = useSelector((state) => state.auth);
-  const [socket, setSocket] = useState(null);
-  console.log('SocketProvider', auth.token);
-  useEffect(() => {
-    console.log('Монтирование Сокет провайдера');
-    if (auth.token) {
-      const newSocket = initSocket(auth.token);
-      setSocket(newSocket);
-      console.log('Сокет в провайдере',socket);
-
-      return () => {
-        newSocket.disconnect();
-      };
-    }
-  }, [auth.token]);
-
-  return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>;
-};
 
 const AuthProvider = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState(() => {
