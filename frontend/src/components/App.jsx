@@ -1,3 +1,4 @@
+import { clearCredentials } from "../slices/authSlice.js";
 import React, { useState, useEffect } from "react";
 import {
   BrowserRouter,
@@ -15,10 +16,13 @@ import Navbar from "react-bootstrap/Navbar";
 import { AuthContext, SocketContext } from "../contexts/index.jsx";
 import { useAuth } from "../hooks/index.jsx";
 import { setCredentials } from "../slices/authSlice.js";
-import { useSelector } from "react-redux";
-
+import { useSelector, useDispatch } from "react-redux";
+import { socket } from "../services/socket.js";
+import { addNewMessage } from "../slices/messagesSlice.js";
+import { addNewChannel, setCurrentChannel, removeChannel } from "../slices/channelsSlice.js";
 
 const AuthProvider = ({ children }) => {
+  const dispatch = useDispatch();
   const [loggedIn, setLoggedIn] = useState(() => {
     try {
       const credentials = JSON.parse(window.localStorage.getItem("userId"));
@@ -33,6 +37,7 @@ const AuthProvider = ({ children }) => {
   const logOut = () => {
     localStorage.removeItem("userId");
     setLoggedIn(false);
+    dispatch(clearCredentials());
   };
 
   return (
@@ -62,7 +67,7 @@ const PrivateRoute = ({ children }) => {
 
 const PublicRoute = ({ children }) => {
   const auth = useAuth();
-  console.log('auth Public Route', auth);
+  console.log("auth Public Route", auth);
   const location = useLocation();
 
   return auth.loggedIn ? (
@@ -72,38 +77,95 @@ const PublicRoute = ({ children }) => {
   );
 };
 
+const LogOutButton = () => {
+  const { logOut, loggedIn } = useAuth();
+
+  return loggedIn ? (
+    <button type="button" className="btn btn-primary" onClick={logOut}>
+      Выйти
+    </button>
+  ) : null;
+};
+
 const App = () => {
+  const [isConnected, setIsConnected] = useState(socket.connected);
+  const dispatch = useDispatch();
+  const auth = useAuth();
+  const { channels } = useSelector((state) => {
+    console.log("Состояние из стора", state);
+    return state;
+  });
+  useEffect(() => {
+    const onConnect = () => {
+      console.log("Сокет подключился ура");
+      setIsConnected(true);
+    };
+
+    const onDisconnect = () => {
+      console.log("Сокет отключился ура");
+      setIsConnected(false);
+    };
+
+    const onNewMessage = (payload) => {
+      dispatch(addNewMessage(payload));
+    };
+
+    const onNewChannel = (payload) => {
+      dispatch(addNewChannel(payload));
+
+      //const [currentChannel] = [...channels.list].reverse();
+      dispatch(setCurrentChannel(payload));
+    };
+
+    const onRemoveChannel = (payload) => {
+      dispatch(removeChannel(payload));
+    }
+
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
+    socket.on("newMessage", onNewMessage);
+    socket.on("newChannel", onNewChannel);
+    socket.on('removeChannel', onRemoveChannel);
+    
+
+    return () => {
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
+    };
+  }, []);
+
   return (
     <AuthProvider>
-        <div className="d-flex flex-column bg-white h-100">
-          <Navbar className="bg-light-subtle shadow-sm">
-            <Container>
-              <Navbar.Brand href="/">Sesh Chat</Navbar.Brand>
-            </Container>
-          </Navbar>
+      <div className="d-flex flex-column bg-white h-100">
+        <Navbar className="bg-light-subtle shadow-sm">
+          <Container>
+            <Navbar.Brand href="/">Sesh Chat</Navbar.Brand>
+            <LogOutButton />
+          </Container>
+        </Navbar>
 
-          <BrowserRouter>
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <PrivateRoute>
-                    <MainPage />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/login"
-                element={
-                  <PublicRoute>
-                    <LoginPage />
-                  </PublicRoute>
-                }
-              />
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </BrowserRouter>
-        </div>
+        <BrowserRouter>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <PrivateRoute>
+                  <MainPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                <PublicRoute>
+                  <LoginPage />
+                </PublicRoute>
+              }
+            />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </BrowserRouter>
+      </div>
     </AuthProvider>
   );
 };

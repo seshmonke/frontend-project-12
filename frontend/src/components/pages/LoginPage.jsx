@@ -78,7 +78,7 @@ const LoginForm = () => {
             className={`form-control ${authError && "is-invalid"}`}
           />
           <label htmlFor="password">Пароль</label>
-          <BootstrapForm.Control.Feedback type="invalid">
+          <BootstrapForm.Control.Feedback type="invalid"> 
             {authError}
           </BootstrapForm.Control.Feedback>
         </div>

@@ -1,5 +1,12 @@
-import axios from "axios";
+import {
+  setChannels,
+  setCurrentChannel,
+  removeChannel,
+} from "../../slices/channelsSlice.js";
+import { setMessages, addNewMessage } from "../../slices/messagesSlice.js";
 import React, { useEffect, useState } from "react";
+import axios from "axios";
+import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 import {
@@ -9,12 +16,13 @@ import {
   Nav,
   Button,
   Form as BootstrapForm,
+  Modal,
+  Dropdown,
+  ButtonGroup,
 } from "react-bootstrap";
-import { setChannels } from "../../slices/channelsSlice.js";
-import { setMessages, addNewMessage } from "../../slices/messagesSlice.js";
 import { SocketContext } from "../../contexts/index.jsx";
 import { useSocket } from "../../hooks/index.jsx";
-
+import { Formik, Field, Form } from "formik";
 const MyIcon = () => {
   return (
     <svg
@@ -31,7 +39,34 @@ const MyIcon = () => {
 };
 
 const Channels = ({ channels }) => {
-  console.log("channels in Channels", channels);
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  const { currentChannel } = useSelector((state) => state.channels);
+  const { token } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const handleClick = (channel) => {
+    console.log("НАЖАТИЕ НА КНОПКУ КАНАЛА!");
+    dispatch(setCurrentChannel(channel));
+  };
+
+  const handleRemoveChannel = async (channel) => {
+    const response = await axios.delete(`/api/v1/channels/${channel.id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log(
+      "Респонс из обработчика удаления канала :",
+      JSON.stringify(response)
+    );
+  };
+
+  const handleRenameChannel = (channel) => {};
+
+
+
   return (
     <Nav
       id="channels-box"
@@ -39,14 +74,81 @@ const Channels = ({ channels }) => {
       as="ul"
     >
       {channels.map((channel, index) => {
+        console.log(
+          "Отображение канала: ",
+          JSON.stringify(channel.id),
+          JSON.stringify(currentChannel.id),
+          channel.id === currentChannel.id
+        );
         return (
           <Nav.Item className="w-100" as="li" key={index}>
-            <button
-              type="button"
-              className="w-100 rounded-0 text-start btn btn-secondary"
-            >
-              <span className="me-1">#</span> {channel.name}
-            </button>
+            {channel.removable ? (
+              <Dropdown as={ButtonGroup} className="d-flex">
+                <Button
+                  type="button"
+                  variant={
+                    channel.id === currentChannel.id ? "secondary" : "light"
+                  }
+                  className="w-100 rounded-0 text-start text-truncate"
+                  onClick={() => handleClick(channel)}
+                >
+                  {channel.name}
+                </Button>
+
+                <Dropdown.Toggle
+                  split
+                  id="dropdown-split-basic"
+                  variant={
+                    channel.id === currentChannel.id ? "secondary" : "light"
+                  }
+                />
+
+                <Dropdown.Menu>
+                  <Dropdown.Item
+                    as="button"
+                    onClick={handleShow()}
+                  >
+                    Удалить
+                  </Dropdown.Item>
+                  <Modal>
+                    <Form onSubmit={() => handleRemoveChannel(channel)}>
+                      <Modal.Header closeButton>
+                        <Modal.Title>Удалить канал</Modal.Title>
+                      </Modal.Header>
+                      <Modal.Body>
+                        <Button variant="secondary" onClick={handleClose}>
+                          Отменить
+                        </Button>
+                        <Button
+                          type="submit"
+                          variant="danger"
+                          disabled={isSubmitting}
+                        >
+                        </Button>
+                      </Modal.Body>
+                    </Form>
+                  </Modal>
+                  <Dropdown.Item
+                    as="button"
+                    onClick={() => alert("Кнопка нажата!")}
+                  >
+                    Переименовать
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            ) : (
+              <Button
+                onClick={() => handleClick(channel)}
+                в
+                type="button"
+                variant={
+                  channel.id === currentChannel.id ? "secondary" : "light"
+                }
+                className="w-100 rounded-0 text-start"
+              >
+                <span className="me-1">#</span> {channel.name}
+              </Button>
+            )}
           </Nav.Item>
         );
       })}
@@ -64,14 +166,12 @@ Channels.propTypes = {
 
 const Messages = ({ messages }) => {
   const state = useSelector((state) => {
-    console.log("Состояние из стора в сообщениях", state);
     return state;
   });
 
   return (
     <div id="messages-box" className="chat-messages overflow-auto px-5">
       {messages.map((message, index) => {
-        console.log("Сообщение в динамической генерации", message);
         return (
           <div className="text-break mb-2" key={index}>
             <b>{message.username}</b>: {message.body}
@@ -94,7 +194,6 @@ Messages.propTypes = {
 const MessageForm = () => {
   const [inputValue, setInputValue] = useState("");
   const { channels, auth, messages } = useSelector((state) => {
-    console.log('состояние стора в момент отправки сообщения', state);
     return state;
   });
   const [errorMessage, setErrorMessage] = useState(null);
@@ -110,14 +209,11 @@ const MessageForm = () => {
     };
 
     try {
-      console.log("messages in messages form: ", messages);
-
       const response = await axios.post("/api/v1/messages", newMessage, {
         headers: {
           Authorization: `Bearer ${auth.token}`,
         },
       });
-      console.log("New message response", response);
       setInputValue("");
       setErrorMessage(null);
     } catch (error) {
@@ -160,10 +256,105 @@ const MessageForm = () => {
   );
 };
 
+const NewChannelButton = () => {
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+  const { auth, channels } = useSelector((state) => state);
+
+  console.log("список каналов: ", JSON.stringify(channels.list));
+
+  const NewChannelSchema = Yup.object().shape({
+    channelName: Yup.string()
+      .min(3, "От 3 до 20 символов")
+      .max(20, "От 3 до 20 символов")
+      .required("Обязательное поле")
+      .notOneOf(
+        channels.list.map((channel) => channel.name),
+        "Должно быть уникальным"
+      ),
+  });
+
+  return (
+    <>
+      <button
+        className="p-0 text-primary btn btn-group-vertical"
+        onClick={handleShow}
+      >
+        <MyIcon />
+        <span className="visually-hidden">+</span>
+      </button>
+
+      <Modal show={show} onHide={handleClose} centered>
+        <Formik
+          initialValues={{
+            channelName: "",
+          }}
+          validationSchema={NewChannelSchema}
+          onSubmit={async ({ channelName: name }) => {
+            console.log("Форма отправляется");
+            const response = await axios.post(
+              "/api/v1/channels",
+              { name },
+              {
+                headers: {
+                  Authorization: `Bearer ${auth.token}`,
+                },
+              }
+            );
+            const [newChannel] = [...channels.list].reverse();
+            console.log(
+              "Новый канал в сабмите модального окна",
+              channels,
+              newChannel
+            );
+            handleClose();
+          }}
+        >
+          {({ isSubmitting, errors, touched, handleSubmit }) => (
+            <Form onSubmit={handleSubmit}>
+              <Modal.Header closeButton>
+                <Modal.Title>Добавить канал</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Field
+                  id="channelName"
+                  name="channelName"
+                  className={`form-control ${
+                    errors.channelName && touched.channelName
+                      ? "is-invalid"
+                      : ""
+                  }`}
+                  validateOnBlur
+                />
+                {errors.channelName && touched.channelName ? (
+                  <BootstrapForm.Control.Feedback
+                    type="invalid"
+                    className="d-block"
+                  >
+                    {errors.channelName}
+                  </BootstrapForm.Control.Feedback>
+                ) : null}
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                  Отменить
+                </Button>
+                <Button type="submit" variant="primary" disabled={isSubmitting}>
+                  {isSubmitting ? "Отправка..." : "Отправить"}
+                </Button>
+              </Modal.Footer>
+            </Form>
+          )}
+        </Formik>
+      </Modal>
+    </>
+  );
+};
+
 const MainPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentChannelId, setCurrentChannelId] = useState("1");
   const dispatch = useDispatch();
   const { auth } = useSelector((state) => state);
 
@@ -186,6 +377,8 @@ const MainPage = () => {
         ]);
 
         dispatch(setChannels(channelsResponse.data));
+        const [firstChannel] = channelsResponse.data;
+        dispatch(setCurrentChannel(firstChannel));
         dispatch(setMessages(messagesResponse.data));
       } catch (error) {
         setError(error);
@@ -198,7 +391,10 @@ const MainPage = () => {
   }, [auth.token, dispatch]);
 
   const { channels, messages } = useSelector((state) => {
-    console.log("D. Состояние из стора", state);
+    console.log(
+      "Состояние из стора",
+      JSON.stringify(state.channels.currentChannel)
+    );
     return state;
   });
 
@@ -207,16 +403,17 @@ const MainPage = () => {
     ? currentChannel.name
     : "Канал не выбран";
 
+  const channelMessages = messages.filter(
+    (message) => message.channelId === channels.currentChannel.id
+  );
+
   return (
     <Container className="h-100 my-4 overflow-hidden rounded shadow">
       <Row className="h-100 bg-white flex-md-row">
         <Col className="col-4 col-md-2 border-end px-0 bg-light flex-column h-100 d-flex">
           <div className="d-flex mt-1 justify-content-between mb-2 ps-4 pe-2 p-4">
             <b>Каналы</b>
-            <button className="p-0 text-primary btn btn-group-vertical">
-              <MyIcon />
-              <span className="visually-hidden">+</span>
-            </button>
+            <NewChannelButton />
           </div>
 
           <Channels channels={channels.list} />
@@ -230,7 +427,7 @@ const MainPage = () => {
               <span className="text-muted">0 сообщений</span>
             </div>
 
-            <Messages messages={messages} />
+            <Messages messages={channelMessages} />
 
             <div className="mt-auto px-5 py-3">
               <MessageForm />
