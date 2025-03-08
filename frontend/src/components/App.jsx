@@ -19,7 +19,7 @@ import { setCredentials } from "../slices/authSlice.js";
 import { useSelector, useDispatch } from "react-redux";
 import { socket } from "../services/socket.js";
 import { addNewMessage } from "../slices/messagesSlice.js";
-import { addNewChannel, setCurrentChannel, removeChannel } from "../slices/channelsSlice.js";
+import { addNewChannel, setCurrentChannel, removeChannel, renameChannel } from "../slices/channelsSlice.js";
 
 const AuthProvider = ({ children }) => {
   const dispatch = useDispatch();
@@ -121,11 +121,17 @@ const App = () => {
       dispatch(removeChannel(payload));
     }
 
+    const onRenameChannel = (payload) => {
+      console.log('Пришел ивент на изменение имени канала');
+      dispatch(renameChannel(payload));
+    }
+
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
     socket.on("newMessage", onNewMessage);
     socket.on("newChannel", onNewChannel);
     socket.on('removeChannel', onRemoveChannel);
+    socket.on('renameChannel', onRenameChannel);
     
 
     return () => {

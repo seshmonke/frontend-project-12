@@ -67,6 +67,24 @@ const Channels = ({ channels }) => {
     setSelectedChannel(null);
   };
 
+  const handleShowRenameModal = (channel) => {
+    console.log(
+      "При первом показе модального окна изменения имени канала",
+      JSON.stringify(selectedChannel)
+    );
+    setSelectedChannel(channel);
+    console.log(
+      "После установки актуального канала модального окна",
+      JSON.stringify(selectedChannel)
+    );
+    setShowRenameModal(true);
+  };
+
+  const handleCloseRenameModal = () => {
+    setShowRenameModal(false);
+    setSelectedChannel(null);
+  };
+
   const handleRemoveChannel = async () => {
     if (!selectedChannel) return;
 
@@ -93,8 +111,6 @@ const Channels = ({ channels }) => {
     }
   };
 
-  const handleRenameChannel = (channel) => {};
-
   const handleKeyDown = (event) => {
     console.log("Ивент из Handle key down", event);
     if (event.key === "Enter") {
@@ -110,9 +126,22 @@ const Channels = ({ channels }) => {
 
   useEffect(() => {
     if (showRenameModal && renameInputRef.current) {
-      renameInputRef.current.focus(); // Устанавливаем фокус на поле ввода
+      renameInputRef.current.focus();
+      renameInputRef.current.select();
+       // Устанавливаем фокус на поле ввода
     }
   }, [showRenameModal]);
+
+  const RenameChannelSchema = Yup.object().shape({
+    channelName: Yup.string()
+      .min(3, "От 3 до 20 символов")
+      .max(20, "От 3 до 20 символов")
+      .required("Обязательное поле")
+      .notOneOf(
+        list.map((channel) => channel.name),
+        "Должно быть уникальным"
+      ),
+  });
 
   return (
     <>
@@ -158,13 +187,19 @@ const Channels = ({ channels }) => {
                     >
                       Удалить
                     </Dropdown.Item>
-                    <Dropdown.Item as="button">Переименовать</Dropdown.Item>
+                    <Dropdown.Item
+                      as="button"
+                      onClick={() => {
+                        return handleShowRenameModal(channel);
+                      }}
+                    >
+                      Переименовать
+                    </Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown>
               ) : (
                 <Button
                   onClick={() => handleClick(channel)}
-                  в
                   type="button"
                   variant={
                     channel.id === currentChannel.id ? "secondary" : "light"
@@ -210,36 +245,34 @@ const Channels = ({ channels }) => {
           </div>
         </Modal.Body>
       </Modal>
-      <Modal show={showRenameModal} onHide={setShowRenameModal(false)} centered>
+      <Modal show={showRenameModal} onHide={handleCloseRenameModal} centered>
         <Formik
           initialValues={{
-            channelName: "",
+            channelName: selectedChannel ? selectedChannel.name : "",
           }}
-          validationSchema={NewChannelSchema}
+          validationSchema={RenameChannelSchema}
           onSubmit={async ({ channelName: name }) => {
             console.log("Форма отправляется");
-            const response = await axios.post(
-              "/api/v1/channels",
+            const response = await axios.patch(
+              `/api/v1/channels/${selectedChannel ? selectedChannel.id : null}`,
               { name },
               {
                 headers: {
-                  Authorization: `Bearer ${auth.token}`,
+                  Authorization: `Bearer ${token}`,
                 },
               }
             );
-            const [newChannel] = [...channels.list].reverse();
             console.log(
-              "Новый канал в сабмите модального окна",
-              channels,
-              newChannel
+              "РЕСПОНС ИЗМЕНЕНИЯ ИМЕНИ КАНАЛА: ",
+              response
             );
-            handleClose();
+            handleCloseRenameModal();
           }}
         >
           {({ isSubmitting, errors, touched, handleSubmit }) => (
             <Form onSubmit={handleSubmit}>
               <Modal.Header closeButton>
-                <Modal.Title>Добавить канал</Modal.Title>
+                <Modal.Title>Переименовать канал</Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 <Field
@@ -251,7 +284,7 @@ const Channels = ({ channels }) => {
                       : ""
                   }`}
                   validateOnBlur
-                  innerRef={channelNameRef}
+                  innerRef={renameInputRef}
                 />
                 {errors.channelName && touched.channelName ? (
                   <BootstrapForm.Control.Feedback
@@ -263,7 +296,7 @@ const Channels = ({ channels }) => {
                 ) : null}
               </Modal.Body>
               <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
+                <Button variant="secondary" onClick={handleCloseRenameModal}>
                   Отменить
                 </Button>
                 <Button type="submit" variant="primary" disabled={isSubmitting}>
@@ -321,6 +354,12 @@ const MessageForm = () => {
   });
   const [errorMessage, setErrorMessage] = useState(null);
 
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [channels.currentChannel?.id, channels.currentChannel?.name, channels.list.length]);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!inputValue.trim()) return;
@@ -330,6 +369,7 @@ const MessageForm = () => {
       channelId: channels.currentChannel.id,
       username: auth.username,
     };
+
 
     try {
       const response = await axios.post("/api/v1/messages", newMessage, {
@@ -342,6 +382,7 @@ const MessageForm = () => {
       if (inputRef.current) {
         inputRef.current.focus();
       }
+      inputRef.current?.focus();
     } catch (error) {
       setErrorMessage(error.message || "Ошибка при отправке сообщения");
     }
@@ -385,7 +426,7 @@ const MessageForm = () => {
 };
 
 const NewChannelButton = () => {
-  const channelNameRef = useRef(null);
+  const newChannelFieldRef = useRef(null);
 
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -406,8 +447,8 @@ const NewChannelButton = () => {
   });
 
   useEffect(() => {
-    if (show && channelNameRef.current) {
-      channelNameRef.current.focus();
+    if (show && newChannelFieldRef.current) {
+      newChannelFieldRef.current.focus();
     }
   }, [show]);
 
@@ -462,7 +503,7 @@ const NewChannelButton = () => {
                       : ""
                   }`}
                   validateOnBlur
-                  innerRef={channelNameRef}
+                  innerRef={newChannelFieldRef}
                 />
                 {errors.channelName && touched.channelName ? (
                   <BootstrapForm.Control.Feedback
