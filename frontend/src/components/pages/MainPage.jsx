@@ -3,8 +3,12 @@ import {
   setCurrentChannel,
   removeChannel,
 } from "../../slices/channelsSlice.js";
-import { setMessages, addNewMessage } from "../../slices/messagesSlice.js";
-import React, { useEffect, useState } from "react";
+import {
+  setMessages,
+  addNewMessage,
+  removeChannelMessages,
+} from "../../slices/messagesSlice.js";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
@@ -39,11 +43,13 @@ const MyIcon = () => {
 };
 
 const Channels = ({ channels }) => {
-  const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const deleteButtonRef = useRef(null); // Реф для кнопки "Удалить"
+  const renameInputRef = useRef(null); // Реф для кнопки "Удалить"
+  const [showRemoveModal, setShowRemoveModal] = useState(false);
+  const [showRenameModal, setShowRenameModal] = useState(false);
+  const [selectedChannel, setSelectedChannel] = useState(null);
 
-  const { currentChannel } = useSelector((state) => state.channels);
+  const { currentChannel, list } = useSelector((state) => state.channels);
   const { token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const handleClick = (channel) => {
@@ -51,108 +57,224 @@ const Channels = ({ channels }) => {
     dispatch(setCurrentChannel(channel));
   };
 
-  const handleRemoveChannel = async (channel) => {
-    const response = await axios.delete(`/api/v1/channels/${channel.id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    console.log(
-      "Респонс из обработчика удаления канала :",
-      JSON.stringify(response)
-    );
+  const handleShowRemoveModal = (channel) => {
+    setSelectedChannel(channel);
+    setShowRemoveModal(true);
+  };
+
+  const handleCloseRemoveModal = () => {
+    setShowRemoveModal(false);
+    setSelectedChannel(null);
+  };
+
+  const handleRemoveChannel = async () => {
+    if (!selectedChannel) return;
+
+    try {
+      const response = await axios.delete(
+        `/api/v1/channels/${selectedChannel.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const [generalChannel] = list;
+      dispatch(removeChannelMessages(selectedChannel));
+      dispatch(setCurrentChannel(generalChannel));
+      console.log(
+        "Респонс из обработчика удаления канала :",
+        JSON.stringify(response)
+      );
+    } catch (error) {
+      console.error("Ошибка удаления:", error);
+    } finally {
+      setShowRemoveModal(false);
+    }
   };
 
   const handleRenameChannel = (channel) => {};
 
+  const handleKeyDown = (event) => {
+    console.log("Ивент из Handle key down", event);
+    if (event.key === "Enter") {
+      handleRemoveChannel(); // Вызываем удаление канала при нажатии Enter
+    }
+  };
 
+  useEffect(() => {
+    if (showRemoveModal && deleteButtonRef.current) {
+      deleteButtonRef.current.focus(); // Устанавливаем фокус на кнопку "Удалить"
+    }
+  }, [showRemoveModal]);
+
+  useEffect(() => {
+    if (showRenameModal && renameInputRef.current) {
+      renameInputRef.current.focus(); // Устанавливаем фокус на поле ввода
+    }
+  }, [showRenameModal]);
 
   return (
-    <Nav
-      id="channels-box"
-      className="flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block"
-      as="ul"
-    >
-      {channels.map((channel, index) => {
-        console.log(
-          "Отображение канала: ",
-          JSON.stringify(channel.id),
-          JSON.stringify(currentChannel.id),
-          channel.id === currentChannel.id
-        );
-        return (
-          <Nav.Item className="w-100" as="li" key={index}>
-            {channel.removable ? (
-              <Dropdown as={ButtonGroup} className="d-flex">
+    <>
+      <Nav
+        id="channels-box"
+        className="flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block"
+        as="ul"
+      >
+        {channels.map((channel) => {
+          console.log(
+            "Отображение канала: ",
+            JSON.stringify(channel.id),
+            JSON.stringify(currentChannel.id),
+            channel.id === currentChannel.id
+          );
+          return (
+            <Nav.Item className="w-100" as="li" key={channel.id}>
+              {channel.removable ? (
+                <Dropdown as={ButtonGroup} className="d-flex">
+                  <Button
+                    type="button"
+                    variant={
+                      channel.id === currentChannel.id ? "secondary" : "light"
+                    }
+                    className="w-100 rounded-0 text-start text-truncate"
+                    onClick={() => handleClick(channel)}
+                  >
+                    {channel.name}
+                  </Button>
+
+                  <Dropdown.Toggle
+                    split
+                    id="dropdown-split-basic"
+                    variant={
+                      channel.id === currentChannel.id ? "secondary" : "light"
+                    }
+                  />
+
+                  <Dropdown.Menu>
+                    <Dropdown.Item
+                      as="button"
+                      onClick={() => handleShowRemoveModal(channel)}
+                    >
+                      Удалить
+                    </Dropdown.Item>
+                    <Dropdown.Item as="button">Переименовать</Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              ) : (
                 <Button
+                  onClick={() => handleClick(channel)}
+                  в
                   type="button"
                   variant={
                     channel.id === currentChannel.id ? "secondary" : "light"
                   }
-                  className="w-100 rounded-0 text-start text-truncate"
-                  onClick={() => handleClick(channel)}
+                  className="w-100 rounded-0 text-start"
                 >
-                  {channel.name}
+                  <span className="me-1">#</span> {channel.name}
                 </Button>
-
-                <Dropdown.Toggle
-                  split
-                  id="dropdown-split-basic"
-                  variant={
-                    channel.id === currentChannel.id ? "secondary" : "light"
-                  }
+              )}
+            </Nav.Item>
+          );
+        })}
+      </Nav>
+      <Modal
+        show={showRemoveModal}
+        onHide={handleCloseRemoveModal}
+        centered
+        onKeyDown={handleKeyDown}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Удалить канал</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p className="lead">Уверены?</p>
+          <div className="d-flex justify-content-end">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleCloseRemoveModal}
+              className="me-2"
+            >
+              Отменить
+            </Button>
+            <Button
+              type="button"
+              autoFocus
+              variant="danger"
+              onClick={handleRemoveChannel}
+              ref={deleteButtonRef}
+            >
+              Удалить
+            </Button>
+          </div>
+        </Modal.Body>
+      </Modal>
+      <Modal show={showRenameModal} onHide={setShowRenameModal(false)} centered>
+        <Formik
+          initialValues={{
+            channelName: "",
+          }}
+          validationSchema={NewChannelSchema}
+          onSubmit={async ({ channelName: name }) => {
+            console.log("Форма отправляется");
+            const response = await axios.post(
+              "/api/v1/channels",
+              { name },
+              {
+                headers: {
+                  Authorization: `Bearer ${auth.token}`,
+                },
+              }
+            );
+            const [newChannel] = [...channels.list].reverse();
+            console.log(
+              "Новый канал в сабмите модального окна",
+              channels,
+              newChannel
+            );
+            handleClose();
+          }}
+        >
+          {({ isSubmitting, errors, touched, handleSubmit }) => (
+            <Form onSubmit={handleSubmit}>
+              <Modal.Header closeButton>
+                <Modal.Title>Добавить канал</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Field
+                  id="channelName"
+                  name="channelName"
+                  className={`form-control ${
+                    errors.channelName && touched.channelName
+                      ? "is-invalid"
+                      : ""
+                  }`}
+                  validateOnBlur
+                  innerRef={channelNameRef}
                 />
-
-                <Dropdown.Menu>
-                  <Dropdown.Item
-                    as="button"
-                    onClick={handleShow()}
+                {errors.channelName && touched.channelName ? (
+                  <BootstrapForm.Control.Feedback
+                    type="invalid"
+                    className="d-block"
                   >
-                    Удалить
-                  </Dropdown.Item>
-                  <Modal>
-                    <Form onSubmit={() => handleRemoveChannel(channel)}>
-                      <Modal.Header closeButton>
-                        <Modal.Title>Удалить канал</Modal.Title>
-                      </Modal.Header>
-                      <Modal.Body>
-                        <Button variant="secondary" onClick={handleClose}>
-                          Отменить
-                        </Button>
-                        <Button
-                          type="submit"
-                          variant="danger"
-                          disabled={isSubmitting}
-                        >
-                        </Button>
-                      </Modal.Body>
-                    </Form>
-                  </Modal>
-                  <Dropdown.Item
-                    as="button"
-                    onClick={() => alert("Кнопка нажата!")}
-                  >
-                    Переименовать
-                  </Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            ) : (
-              <Button
-                onClick={() => handleClick(channel)}
-                в
-                type="button"
-                variant={
-                  channel.id === currentChannel.id ? "secondary" : "light"
-                }
-                className="w-100 rounded-0 text-start"
-              >
-                <span className="me-1">#</span> {channel.name}
-              </Button>
-            )}
-          </Nav.Item>
-        );
-      })}
-    </Nav>
+                    {errors.channelName}
+                  </BootstrapForm.Control.Feedback>
+                ) : null}
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                  Отменить
+                </Button>
+                <Button type="submit" variant="primary" disabled={isSubmitting}>
+                  {isSubmitting ? "Отправка..." : "Отправить"}
+                </Button>
+              </Modal.Footer>
+            </Form>
+          )}
+        </Formik>
+      </Modal>
+    </>
   );
 };
 
@@ -192,6 +314,7 @@ Messages.propTypes = {
 };
 
 const MessageForm = () => {
+  const inputRef = useRef(null);
   const [inputValue, setInputValue] = useState("");
   const { channels, auth, messages } = useSelector((state) => {
     return state;
@@ -202,7 +325,7 @@ const MessageForm = () => {
     event.preventDefault();
     if (!inputValue.trim()) return;
     const newMessage = {
-      id: messages.length,
+      id: messages.list.length,
       body: inputValue,
       channelId: channels.currentChannel.id,
       username: auth.username,
@@ -216,6 +339,9 @@ const MessageForm = () => {
       });
       setInputValue("");
       setErrorMessage(null);
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
     } catch (error) {
       setErrorMessage(error.message || "Ошибка при отправке сообщения");
     }
@@ -225,6 +351,8 @@ const MessageForm = () => {
     <BootstrapForm className="py-1 border rounded-2" onSubmit={handleSubmit}>
       <BootstrapForm.Group className="input-group has-validation">
         <BootstrapForm.Control
+          autoComplete="off"
+          ref={inputRef}
           name="body"
           aria-label="Новое сообщение"
           placeholder="Введите сообщение..."
@@ -257,6 +385,8 @@ const MessageForm = () => {
 };
 
 const NewChannelButton = () => {
+  const channelNameRef = useRef(null);
+
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -274,6 +404,12 @@ const NewChannelButton = () => {
         "Должно быть уникальным"
       ),
   });
+
+  useEffect(() => {
+    if (show && channelNameRef.current) {
+      channelNameRef.current.focus();
+    }
+  }, [show]);
 
   return (
     <>
@@ -326,6 +462,7 @@ const NewChannelButton = () => {
                       : ""
                   }`}
                   validateOnBlur
+                  innerRef={channelNameRef}
                 />
                 {errors.channelName && touched.channelName ? (
                   <BootstrapForm.Control.Feedback
@@ -403,7 +540,7 @@ const MainPage = () => {
     ? currentChannel.name
     : "Канал не выбран";
 
-  const channelMessages = messages.filter(
+  const channelMessages = messages.list.filter(
     (message) => message.channelId === channels.currentChannel.id
   );
 

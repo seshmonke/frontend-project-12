@@ -1,21 +1,25 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = [];
+const initialState = { list: [] };
 
 const messagesSlice = createSlice({
     name: 'messages',
     initialState,
     reducers: {
         setMessages: (state, action) => {
-            state.splice(0, state.length, ...action.payload);
+            state.list = action.payload;
         },
         addNewMessage: (state, action) => {
-            state.push(action.payload);
+            state.list.push(action.payload);
         },
+        removeChannelMessages: (state, action) => {
+            state.list = state.list.filter((message) => message.channelId !== action.payload.id);
+            console.log('ПЭЙЛОУД УДАЛЕНИЯ СООБЩЕНИЙ: ', JSON.stringify(action.payload), 'СОСТОЯНИЕ СЛАЙСА СООБЩЕНИЙ', JSON.stringify(state));
+        }
     }
     
 });
 
-export const { setMessages, addNewMessage } = messagesSlice.actions;
+export const { setMessages, addNewMessage, removeChannelMessages } = messagesSlice.actions;
 
 export default messagesSlice.reducer;
