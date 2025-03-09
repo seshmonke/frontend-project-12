@@ -10,12 +10,12 @@ import {
 import { NotFoundPage } from "./pages/NotFoundPage.jsx";
 import { LoginPage } from "./pages/LoginPage.jsx";
 import { MainPage } from "./pages/MainPage.jsx";
+import { SignUpPage } from "./pages/SignUpPage.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
-import { AuthContext, SocketContext } from "../contexts/index.jsx";
+import { AuthContext } from "../contexts/index.jsx";
 import { useAuth } from "../hooks/index.jsx";
-import { setCredentials } from "../slices/authSlice.js";
 import { useSelector, useDispatch } from "react-redux";
 import { socket } from "../services/socket.js";
 import { addNewMessage } from "../slices/messagesSlice.js";
@@ -88,22 +88,18 @@ const LogOutButton = () => {
 };
 
 const App = () => {
-  const [isConnected, setIsConnected] = useState(socket.connected);
   const dispatch = useDispatch();
-  const auth = useAuth();
-  const { channels } = useSelector((state) => {
+  useSelector((state) => {
     console.log("Состояние из стора", state);
     return state;
   });
   useEffect(() => {
     const onConnect = () => {
       console.log("Сокет подключился ура");
-      setIsConnected(true);
     };
 
     const onDisconnect = () => {
       console.log("Сокет отключился ура");
-      setIsConnected(false);
     };
 
     const onNewMessage = (payload) => {
@@ -112,8 +108,6 @@ const App = () => {
 
     const onNewChannel = (payload) => {
       dispatch(addNewChannel(payload));
-
-      //const [currentChannel] = [...channels.list].reverse();
       dispatch(setCurrentChannel(payload));
     };
 
@@ -122,7 +116,6 @@ const App = () => {
     }
 
     const onRenameChannel = (payload) => {
-      console.log('Пришел ивент на изменение имени канала');
       dispatch(renameChannel(payload));
     }
 
@@ -168,6 +161,7 @@ const App = () => {
                 </PublicRoute>
               }
             />
+            <Route path="/signup" element={<SignUpPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </BrowserRouter>

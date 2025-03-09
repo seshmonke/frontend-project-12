@@ -1,11 +1,9 @@
 import {
   setChannels,
   setCurrentChannel,
-  removeChannel,
 } from "../../slices/channelsSlice.js";
 import {
   setMessages,
-  addNewMessage,
   removeChannelMessages,
 } from "../../slices/messagesSlice.js";
 import React, { useEffect, useRef, useState } from "react";
@@ -24,9 +22,8 @@ import {
   Dropdown,
   ButtonGroup,
 } from "react-bootstrap";
-import { SocketContext } from "../../contexts/index.jsx";
-import { useSocket } from "../../hooks/index.jsx";
 import { Formik, Field, Form } from "formik";
+
 const MyIcon = () => {
   return (
     <svg
@@ -531,8 +528,6 @@ const NewChannelButton = () => {
 };
 
 const MainPage = () => {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const dispatch = useDispatch();
   const { auth } = useSelector((state) => state);
 
@@ -559,10 +554,8 @@ const MainPage = () => {
         dispatch(setCurrentChannel(firstChannel));
         dispatch(setMessages(messagesResponse.data));
       } catch (error) {
-        setError(error);
-      } finally {
-        setLoading(false);
-      }
+        console.error(error);
+      } 
     };
 
     fetchData();
