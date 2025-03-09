@@ -358,7 +358,7 @@ const MessageForm = () => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
-  }, [channels.currentChannel?.id, channels.currentChannel?.name, channels.list.length]);
+  }, [channels.currentChannel]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
