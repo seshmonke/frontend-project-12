@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   Container,
   Row,
@@ -11,8 +11,16 @@ import {
 import * as Yup from "yup";
 import signUpImage from "../../assets/signUpImage.png";
 import { Formik, Field, Form as FormikForm } from "formik";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "../../slices/authSlice";
+import { useAuth } from "../../hooks";
+import { useNavigate } from "react-router-dom";
 
 const SignUpPage = () => {
+  const { loggedIn, logIn, logOut } = useAuth();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const fieldRefs = {
     username: useRef(null),
     password: useRef(null),
@@ -23,7 +31,33 @@ const SignUpPage = () => {
     fieldRefs.username.current?.focus();
   }, []);
 
-  const handleSubmit = (values, { resetForm, isSubmitting }) => {};
+  const [signUpError, setSignUpError] = useState(null);
+
+  const handleSubmit = async (
+    { username, password },
+    { resetForm, isSubmitting }
+  ) => {
+    try {
+      const response = await axios.post("/api/v1/signup", {
+        username,
+        password,
+      });
+      console.log("Создание нового пользователя респонс: ", response);
+      resetForm();
+      window.localStorage.setItem("userId", JSON.stringify(response.data));
+      dispatch(setCredentials(response.data));
+      setSignUpError(null);
+      logIn();
+      navigate("/");
+      console.log("getItem", window.localStorage.getItem("userId"));
+      console.log("response", response, "isSubmitting", isSubmitting);
+    } catch (error) {
+      console.log("error", error);
+      error.response
+        ? setSignUpError("Некорректные данные при регистрации")
+        : setSignUpError("Произошла ошибка. Попробуйте снова.");
+    }
+  };
 
   const SignupSchema = Yup.object().shape({
     username: Yup.string()
