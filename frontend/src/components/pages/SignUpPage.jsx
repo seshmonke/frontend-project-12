@@ -53,11 +53,15 @@ const SignUpPage = () => {
       console.log("response", response, "isSubmitting", isSubmitting);
     } catch (error) {
       console.log("error", error);
-      error.response
-        ? setSignUpError("Некорректные данные при регистрации")
+      error.response.status === 409
+        ? setSignUpError("Такой пользователь уже существует")
         : setSignUpError("Произошла ошибка. Попробуйте снова.");
     }
   };
+
+  useEffect(() => {
+    console.log("Асинхронное изменение состояния ошибки", signUpError);
+  }, [signUpError]);
 
   const SignupSchema = Yup.object().shape({
     username: Yup.string()
@@ -122,8 +126,10 @@ const SignUpPage = () => {
                 {({ isSubmitting, submitForm, values, setFieldTouched }) => (
                   <Form as={FormikForm} className="w-50">
                     <h1 className="text-center mb-4">Регистрация</h1>
-
-                    {Object.keys(fieldRefs).map((fieldName, index) => {
+                    {signUpError && (
+                      <div className="alert alert-danger">{signUpError}</div>
+                    )}
+                    {Object.keys(fieldRefs).map((fieldName) => {
                       return (
                         <FloatingLabel
                           key={fieldName}
@@ -168,7 +174,7 @@ const SignUpPage = () => {
                                   }
                                 />
                                 <Form.Control.Feedback type="invalid" tooltip>
-                                  {meta.error}
+                                  {meta.touched && meta.error}
                                 </Form.Control.Feedback>
                               </>
                             )}
@@ -176,97 +182,6 @@ const SignUpPage = () => {
                         </FloatingLabel>
                       );
                     })}
-                    {/*
-                    <FloatingLabel //Username input
-                      controlId="username"
-                      label="Имя пользователя"
-                      className="mb-3"
-                    >
-                      <Field name="username">
-                        {({ field, meta }) => (
-                          <>
-                            <Form.Control
-                              {...field}
-                              type="text"
-                              placeholder="От 3 до 20 символов"
-                              isInvalid={meta.touched && !!meta.error}
-                              autoComplete="username"
-                              required
-                              ref={usernameRef}
-                              onKeyDown={(e) =>
-                                handleKeyDown(
-                                  e,
-                                  passwordRef,
-                                  submitForm,
-                                  values
-                                )
-                              }
-                            />
-                            <Form.Control.Feedback type="invalid" tooltip>
-                              {meta.error}
-                            </Form.Control.Feedback>
-                          </>
-                        )}
-                      </Field>
-                    </FloatingLabel>
-                    <FloatingLabel //Password Input
-                      controlId="password"
-                      label="Пароль"
-                      className="mb-3"
-                    >
-                      <Field name="password">
-                        {({ field, meta }) => (
-                          <>
-                            <Form.Control
-                              {...field}
-                              type="password"
-                              placeholder="Не менее 6 символов"
-                              isInvalid={meta.touched && !!meta.error}
-                              autoComplete="new-password"
-                              ref={passwordRef}
-                              onKeyDown={(e) =>
-                                handleKeyDown(
-                                  e,
-                                  confirmPasswordRef,
-                                  submitForm,
-                                  values
-                                )
-                              }
-                            />
-                            <Form.Control.Feedback type="invalid" tooltip>
-                              {meta.error}
-                            </Form.Control.Feedback>
-                          </>
-                        )}
-                      </Field>
-                    </FloatingLabel>
-                    <FloatingLabel //Confirm password Input
-                      controlId="confirmPassword"
-                      label="Подтвердите пароль"
-                      className="mb-3"
-                    >
-                      <Field name="confirmPassword">
-                        {({ field, meta }) => (
-                          <>
-                            <Form.Control
-                              {...field}
-                              type="password"
-                              placeholder="Пароли должны совпадать"
-                              isInvalid={meta.touched && !!meta.error}
-                              autoComplete="new-password"
-                              ref={confirmPasswordRef}
-                              onKeyDown={(e) =>
-                                handleKeyDown(e, null, submitForm, values)
-                              }
-                            />
-                            <Form.Control.Feedback type="invalid" tooltip>
-                              {meta.error}
-                            </Form.Control.Feedback>
-                          </>
-                        )}
-                      </Field>
-                    </FloatingLabel>
-*/}
                     <Button
                       variant="outline-primary"
                       type="submit"
