@@ -19,7 +19,12 @@ import { useAuth } from "../hooks/index.jsx";
 import { useSelector, useDispatch } from "react-redux";
 import { socket } from "../services/socket.js";
 import { addNewMessage } from "../slices/messagesSlice.js";
-import { addNewChannel, setCurrentChannel, removeChannel, renameChannel } from "../slices/channelsSlice.js";
+import {
+  addNewChannel,
+  removeChannel,
+  renameChannel,
+} from "../slices/channelsSlice.js";
+import { useTranslation } from "react-i18next";
 
 const AuthProvider = ({ children }) => {
   const dispatch = useDispatch();
@@ -78,22 +83,28 @@ const PublicRoute = ({ children }) => {
 };
 
 const LogOutButton = () => {
+  const { t, i18n } = useTranslation();
   const { logOut, loggedIn } = useAuth();
 
   return loggedIn ? (
     <button type="button" className="btn btn-primary" onClick={logOut}>
-      Выйти
+      {t('logoutButton')}
     </button>
   ) : null;
 };
 
+
 const App = () => {
+  const { t, i18n } = useTranslation();
+
+  const { logOut, loggedIn } = useAuth();
   const dispatch = useDispatch();
   useSelector((state) => {
     console.log("Состояние из стора", state);
     return state;
   });
   useEffect(() => {
+    console.log('logged in: ', loggedIn)
     const onConnect = () => {
       console.log("Сокет подключился ура");
     };
@@ -108,24 +119,23 @@ const App = () => {
 
     const onNewChannel = (payload) => {
       dispatch(addNewChannel(payload));
-      dispatch(setCurrentChannel(payload));
+      //dispatch(setCurrentChannel(payload));
     };
 
     const onRemoveChannel = (payload) => {
       dispatch(removeChannel(payload));
-    }
+    };
 
     const onRenameChannel = (payload) => {
       dispatch(renameChannel(payload));
-    }
+    };
 
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
     socket.on("newMessage", onNewMessage);
     socket.on("newChannel", onNewChannel);
-    socket.on('removeChannel', onRemoveChannel);
-    socket.on('renameChannel', onRenameChannel);
-    
+    socket.on("removeChannel", onRemoveChannel);
+    socket.on("renameChannel", onRenameChannel);
 
     return () => {
       socket.off("connect", onConnect);
@@ -138,7 +148,7 @@ const App = () => {
       <div className="d-flex flex-column bg-white h-100">
         <Navbar className="bg-light-subtle shadow-sm">
           <Container>
-            <Navbar.Brand href="/">Sesh Chat</Navbar.Brand>
+            <Navbar.Brand href="/">{t('appTitle')}</Navbar.Brand>
             <LogOutButton />
           </Container>
         </Navbar>
