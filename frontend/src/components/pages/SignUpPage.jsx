@@ -16,14 +16,15 @@ import { useDispatch } from "react-redux";
 import { setCredentials } from "../../slices/authSlice";
 import { useAuth } from "../../hooks";
 import { useNavigate } from "react-router-dom";
-import { t } from "i18next";
 import { useTranslation } from "react-i18next";
+import { ToastContainer, toast } from "react-toastify";
 
 const SignUpPage = () => {
   const { loggedIn, logIn, logOut } = useAuth();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [signUpError, setSignUpError] = useState(null);
   const fieldRefs = {
     username: useRef(null),
     password: useRef(null),
@@ -34,7 +35,12 @@ const SignUpPage = () => {
     fieldRefs.username.current?.focus();
   }, []);
 
-  const [signUpError, setSignUpError] = useState(null);
+  useEffect(() => {
+    if (signUpError) {
+      toast.error(signUpError);
+    }
+  }, [signUpError]);
+
 
   const handleSubmit = async (
     { username, password },
@@ -56,9 +62,9 @@ const SignUpPage = () => {
       console.log("response", response, "isSubmitting", isSubmitting);
     } catch (error) {
       console.log("error", error);
-      error.response.status === 409
-        ? setSignUpError("Такой пользователь уже существует")
-        : setSignUpError("Произошла ошибка. Попробуйте снова.");
+      error.response?.status === 409
+        ? setSignUpError(t("notification.alreadyExist"))
+        : setSignUpError(t("notification.error"));
     }
   };
 
@@ -68,15 +74,15 @@ const SignUpPage = () => {
 
   const SignupSchema = Yup.object().shape({
     username: Yup.string()
-      .required(t('validation.required'))
-      .min(3, t('validation.usernameMinMax'))
-      .max(20, t('validation.usernameMinMax')),
+      .required(t("validation.required"))
+      .min(3, t("validation.usernameMinMax"))
+      .max(20, t("validation.usernameMinMax")),
     password: Yup.string()
-      .required(t('validation.required'))
-      .min(6, t('validation.passwordMin')),
+      .required(t("validation.required"))
+      .min(6, t("validation.passwordMin")),
     confirmPassword: Yup.string()
-      .required(t('validation.required'))
-      .oneOf([Yup.ref("password"), null], t('validation.passwordMatch')),
+      .required(t("validation.required"))
+      .oneOf([Yup.ref("password"), null], t("validation.required")),
   });
 
   const handleKeyDown = (event, submitForm, values, setFieldTouched) => {
@@ -128,7 +134,9 @@ const SignUpPage = () => {
               >
                 {({ isSubmitting, submitForm, values, setFieldTouched }) => (
                   <Form as={FormikForm} className="w-50">
-                    <h1 className="text-center mb-4">{t('signUpPage.title')}</h1>
+                    <h1 className="text-center mb-4">
+                      {t("signUpPage.title")}
+                    </h1>
                     {signUpError && (
                       <div className="alert alert-danger">{signUpError}</div>
                     )}
@@ -139,10 +147,10 @@ const SignUpPage = () => {
                           controlId={fieldName}
                           label={
                             fieldName === "username"
-                              ? t('signUpPage.username')
+                              ? t("signUpPage.username")
                               : fieldName === "password"
-                              ? t('signUpPage.password')
-                              : t('signUpPage.confirmPassword')
+                              ? t("signUpPage.password")
+                              : t("signUpPage.confirmPassword")
                           }
                           className="mb-3"
                         >
@@ -160,10 +168,10 @@ const SignUpPage = () => {
                                   }
                                   placeholder={
                                     fieldName === "username"
-                                      ? "От 3 до 20 символов"
+                                      ? t("validation.usernameMinMax")
                                       : fieldName === "password"
-                                      ? "Не менее 6 символов"
-                                      : "Пароли должны совпадать"
+                                      ? t("validation.passwordMin")
+                                      : t("validation.passwordMatch")
                                   }
                                   isInvalid={meta.touched && !!meta.error}
                                   ref={fieldRefs[fieldName]}
@@ -190,7 +198,9 @@ const SignUpPage = () => {
                       type="submit"
                       className="w-100"
                     >
-                      {isSubmitting ? t('signUpPage.sending') : t('signUpPage.registration')}
+                      {isSubmitting
+                        ? t("signUpPage.sending")
+                        : t("signUpPage.registration")}
                     </Button>
                   </Form>
                 )}

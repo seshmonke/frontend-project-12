@@ -26,6 +26,8 @@ import {
   renameChannel,
 } from "../slices/channelsSlice.js";
 import { useTranslation } from "react-i18next";
+import { ToastContainer, toast } from 'react-toastify';
+
 
 const AuthProvider = ({ children }) => {
   const dispatch = useDispatch();
@@ -155,6 +157,7 @@ const App = () => {
 
   return (
     <AuthProvider>
+      <ToastContainer />
       <div className="d-flex flex-column bg-white h-100">
         <Navbar className="bg-light-subtle shadow-sm">
           <Container>

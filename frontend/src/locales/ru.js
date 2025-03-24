@@ -23,7 +23,7 @@ export default {
         title: 'Войти',
         yourName: 'Ваш ник',
         yourPassword: 'Пароль',
-        footer: 'Нет аккаунта?',
+        footer: 'Нет аккаунта?  ',
         registration: 'Регистрация'
       },
       signUpPage: {
@@ -41,6 +41,12 @@ export default {
         unique: 'Должно быть уникальным',
         passwordMin: 'Минимум 6 символов',
         passwordMatch: 'Пароли должны совпадать'
+      },
+      notification: {
+        wrongCredentials: 'Неверные имя пользователя или пароль',
+        error: 'Произошла ошибка. Попробуйте снова.',
+        alreadyExist: 'Такой пользователь уже существует',
+        
       }
     }
   };

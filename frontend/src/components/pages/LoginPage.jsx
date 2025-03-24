@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
@@ -16,18 +16,28 @@ import { useSelector, useDispatch } from "react-redux";
 import { setCredentials } from "../../slices/authSlice.js";
 import { useAuth } from "../../hooks/index.jsx";
 import { useTranslation } from "react-i18next";
+import { ToastContainer, toast } from "react-toastify";
 
 const LoginForm = () => {
+  const usernameRef = useRef(null);
   const { t } = useTranslation();
   const { loggedIn, logIn, logOut } = useAuth();
   const navigate = useNavigate();
-  const [authError, setAuthError] = useState(null);
   const dispatch = useDispatch();
+  const [authError, setAuthError] = useState(null);
 
   const userData = useSelector((state) => {
     console.log("СОСТЯНИЕ СЛАЙСА: ", state);
     return state.auth;
   });
+
+  useEffect(() => {
+    if (authError && usernameRef.current) {
+      usernameRef.current.focus();
+      usernameRef.current.select();
+    }
+  }, [authError]);
+
 
   const handleSubmit = async (values, { resetForm, isSubmitting }) => {
     try {
@@ -37,17 +47,21 @@ const LoginForm = () => {
       resetForm();
       window.localStorage.setItem("userId", JSON.stringify(data));
       dispatch(setCredentials(data));
-
       setAuthError(null);
+
       logIn();
       navigate("/");
       console.log("getItem", window.localStorage.getItem("userId"));
       console.log("response", response, "isSubmitting", isSubmitting);
     } catch (e) {
       console.log("error", e);
+      //toast(e.message);
+
       e.response
-        ? setAuthError("Неверные имя пользователя или пароль")
-        : setAuthError("Произошла ошибка. Попробуйте снова.");
+        ? setAuthError(t('notification.wrongCredentials'))
+        : setAuthError(t('notification.error'));
+
+      toast.error(authError);
     }
   };
 
@@ -57,7 +71,7 @@ const LoginForm = () => {
       onSubmit={handleSubmit}
     >
       <Form className="col-12 col-md-6 mt-3 mt-mb-0">
-        <h1 className="text-center mb-4">{t('loginPage.title')}</h1>
+        <h1 className="text-center mb-4">{t("loginPage.title")}</h1>
         <div className="form-floating mb-3">
           <Field
             type="text"
@@ -67,8 +81,9 @@ const LoginForm = () => {
             required
             id="username"
             className={`form-control ${authError && "is-invalid"}`}
+            innerRef={usernameRef}
           />
-          <label htmlFor="username">{t('loginPage.yourName')}</label>
+          <label htmlFor="username">{t("loginPage.yourName")}</label>
         </div>
         <div className="form-floating mb-3">
           <Field
@@ -80,7 +95,7 @@ const LoginForm = () => {
             id="password"
             className={`form-control ${authError && "is-invalid"}`}
           />
-          <label htmlFor="password">{t('loginPage.yourPassword')}</label>
+          <label htmlFor="password">{t("loginPage.yourPassword")}</label>
           <BootstrapForm.Control.Feedback type="invalid">
             {authError}
           </BootstrapForm.Control.Feedback>
@@ -111,8 +126,8 @@ const LoginPage = () => {
               <LoginForm />
             </Card.Body>
             <Card.Footer>
-              <span>{t('loginPage.footer')} </span>
-              <a href="/signup">{t('loginPage.registration')}</a>
+              <span>{t("loginPage.footer")}</span>
+              <a href="/signup">{t("loginPage.registration")}</a>
             </Card.Footer>
           </Card>
         </Col>
