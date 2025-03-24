@@ -1,7 +1,4 @@
-import {
-  setChannels,
-  setCurrentChannel,
-} from "../../slices/channelsSlice.js";
+import { setChannels, setCurrentChannel } from "../../slices/channelsSlice.js";
 import {
   setMessages,
   removeChannelMessages,
@@ -23,6 +20,7 @@ import {
   ButtonGroup,
 } from "react-bootstrap";
 import { Formik, Field, Form } from "formik";
+import { useTranslation } from "react-i18next";
 
 const MyIcon = () => {
   return (
@@ -125,7 +123,7 @@ const Channels = ({ channels }) => {
     if (showRenameModal && renameInputRef.current) {
       renameInputRef.current.focus();
       renameInputRef.current.select();
-       // Устанавливаем фокус на поле ввода
+      // Устанавливаем фокус на поле ввода
     }
   }, [showRenameModal]);
 
@@ -259,10 +257,7 @@ const Channels = ({ channels }) => {
                 },
               }
             );
-            console.log(
-              "РЕСПОНС ИЗМЕНЕНИЯ ИМЕНИ КАНАЛА: ",
-              response
-            );
+            console.log("РЕСПОНС ИЗМЕНЕНИЯ ИМЕНИ КАНАЛА: ", response);
             handleCloseRenameModal();
           }}
         >
@@ -367,7 +362,6 @@ const MessageForm = () => {
       username: auth.username,
     };
 
-
     try {
       const response = await axios.post("/api/v1/messages", newMessage, {
         headers: {
@@ -423,6 +417,7 @@ const MessageForm = () => {
 };
 
 const NewChannelButton = () => {
+  const dispatch = useDispatch();
   const newChannelFieldRef = useRef(null);
 
   const [show, setShow] = useState(false);
@@ -466,23 +461,29 @@ const NewChannelButton = () => {
           }}
           validationSchema={NewChannelSchema}
           onSubmit={async ({ channelName: name }) => {
-            console.log("Форма отправляется");
-            const response = await axios.post(
-              "/api/v1/channels",
-              { name },
-              {
-                headers: {
-                  Authorization: `Bearer ${auth.token}`,
-                },
-              }
-            );
-            const [newChannel] = [...channels.list].reverse();
-            console.log(
-              "Новый канал в сабмите модального окна",
-              channels,
-              newChannel
-            );
-            handleClose();
+            try {
+              console.log("Форма отправляется");
+              const response = await axios.post(
+                "/api/v1/channels",
+                { name },
+                {
+                  headers: {
+                    Authorization: `Bearer ${auth.token}`,
+                  },
+                }
+              );
+              console.log(response);
+              const [newChannel] = [...channels.list].reverse();
+              console.log(
+                "Новый канал в сабмите модального окна",
+                channels,
+                newChannel
+              );
+              dispatch(setCurrentChannel(response.data));
+              handleClose();
+            } catch (error) {
+              console.log(error);
+            }
           }}
         >
           {({ isSubmitting, errors, touched, handleSubmit }) => (
@@ -530,6 +531,7 @@ const NewChannelButton = () => {
 const MainPage = () => {
   const dispatch = useDispatch();
   const { auth } = useSelector((state) => state);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!auth.token) return;
@@ -555,7 +557,7 @@ const MainPage = () => {
         dispatch(setMessages(messagesResponse.data));
       } catch (error) {
         console.error(error);
-      } 
+      }
     };
 
     fetchData();
@@ -595,7 +597,13 @@ const MainPage = () => {
               <p className="m-0">
                 <b># {currentChannelName}</b>
               </p>
-              <span className="text-muted">0 сообщений</span>
+              <span className="text-muted">
+                {t("mainPage.messages", {
+                  count: channelMessages.filter(
+                    (message) => message.channelId === currentChannel.id
+                  ).length,
+                })}
+              </span>
             </div>
 
             <Messages messages={channelMessages} />

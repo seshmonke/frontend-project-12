@@ -3,8 +3,11 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import resources from './locales/index.js';
 
-i18next 
-  .use(initReactI18next) // передаем экземпляр i18n в react-i18next, который сделает его доступным для всех компонентов через context API.
+const i18nInstance = i18next.createInstance();
+
+
+i18nInstance
+  .use(initReactI18next) // передаем экземпляр i18n в react-i18next
   .use(LanguageDetector) // с помощью плагина определяем язык пользователя в браузере
   .init({
     resources, // передаем переводы текстов интерфейса в формате JSON
@@ -12,7 +15,10 @@ i18next
     interpolation: {
       escapeValue: false, // экранирование уже есть в React, поэтому отключаем
     },
-    debug: true,
+    debug: true, // Enable debug mode for development
+    lng: 'ru', // Set default language to Russian for testing
+    compatibilityJSON: 'v3',
   });
 
-export default i18next;
+
+export default i18nInstance;

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from 'prop-types';
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
 import loginImage from "../../assets/loginImage.png";
@@ -14,8 +15,10 @@ import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { setCredentials } from "../../slices/authSlice.js";
 import { useAuth } from "../../hooks/index.jsx";
+import { useTranslation } from "react-i18next";
 
 const LoginForm = () => {
+  const { t } = useTranslation();
   const { loggedIn, logIn, logOut } = useAuth();
   const navigate = useNavigate();
   const [authError, setAuthError] = useState(null);
@@ -54,7 +57,7 @@ const LoginForm = () => {
       onSubmit={handleSubmit}
     >
       <Form className="col-12 col-md-6 mt-3 mt-mb-0">
-        <h1 className="text-center mb-4">Войти</h1>
+        <h1 className="text-center mb-4">{t('loginPage.title')}</h1>
         <div className="form-floating mb-3">
           <Field
             type="text"
@@ -107,6 +110,7 @@ const FormCard = () => {
   );
 };
 
+
 const LoginPage = () => {
   return (
     <Container fluid className="h-100">
@@ -117,6 +121,10 @@ const LoginPage = () => {
       </Row>
     </Container>
   );
+};
+
+LoginPage.propTypes = {
+  location: PropTypes.object
 };
 
 export { LoginPage };

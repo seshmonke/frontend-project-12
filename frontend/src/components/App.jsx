@@ -1,5 +1,6 @@
 import { clearCredentials } from "../slices/authSlice.js";
 import React, { useState, useEffect } from "react";
+import PropTypes from 'prop-types';
 import {
   BrowserRouter,
   Routes,
@@ -52,6 +53,10 @@ const AuthProvider = ({ children }) => {
   );
 };
 
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
 const PrivateRoute = ({ children }) => {
   const auth = useAuth();
   const location = useLocation();
@@ -70,6 +75,10 @@ const PrivateRoute = ({ children }) => {
   );
 };
 
+PrivateRoute.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
 const PublicRoute = ({ children }) => {
   const auth = useAuth();
   console.log("auth Public Route", auth);
@@ -82,8 +91,12 @@ const PublicRoute = ({ children }) => {
   );
 };
 
+PublicRoute.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
 const LogOutButton = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { logOut, loggedIn } = useAuth();
 
   return loggedIn ? (
@@ -93,10 +106,7 @@ const LogOutButton = () => {
   ) : null;
 };
 
-
 const App = () => {
-  const { t, i18n } = useTranslation();
-
   const { logOut, loggedIn } = useAuth();
   const dispatch = useDispatch();
   useSelector((state) => {
@@ -148,7 +158,7 @@ const App = () => {
       <div className="d-flex flex-column bg-white h-100">
         <Navbar className="bg-light-subtle shadow-sm">
           <Container>
-            <Navbar.Brand href="/">{t('appTitle')}</Navbar.Brand>
+            <Navbar.Brand href="/">Sesh Chat</Navbar.Brand>
             <LogOutButton />
           </Container>
         </Navbar>
