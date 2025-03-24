@@ -38,6 +38,7 @@ const MyIcon = () => {
 };
 
 const Channels = ({ channels }) => {
+  const { t } = useTranslation();
   const deleteButtonRef = useRef(null); // Реф для кнопки "Удалить"
   const renameInputRef = useRef(null); // Реф для кнопки "Удалить"
   const [showRemoveModal, setShowRemoveModal] = useState(false);
@@ -129,12 +130,12 @@ const Channels = ({ channels }) => {
 
   const RenameChannelSchema = Yup.object().shape({
     channelName: Yup.string()
-      .min(3, "От 3 до 20 символов")
-      .max(20, "От 3 до 20 символов")
-      .required("Обязательное поле")
+      .min(3, t('validation.channelNameMinMax'))
+      .max(20, t('validation.channelNameMinMax'))
+      .required(t('validation.required'))
       .notOneOf(
         list.map((channel) => channel.name),
-        "Должно быть уникальным"
+        t('validation.unique')
       ),
   });
 
@@ -180,7 +181,7 @@ const Channels = ({ channels }) => {
                       as="button"
                       onClick={() => handleShowRemoveModal(channel)}
                     >
-                      Удалить
+                      {t('mainPage.delete')}
                     </Dropdown.Item>
                     <Dropdown.Item
                       as="button"
@@ -188,7 +189,7 @@ const Channels = ({ channels }) => {
                         return handleShowRenameModal(channel);
                       }}
                     >
-                      Переименовать
+                      {t('mainPage.rename')}
                     </Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown>
@@ -215,10 +216,10 @@ const Channels = ({ channels }) => {
         onKeyDown={handleKeyDown}
       >
         <Modal.Header closeButton>
-          <Modal.Title>Удалить канал</Modal.Title>
+          <Modal.Title>{t('mainPage.deleteChannel')}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p className="lead">Уверены?</p>
+          <p className="lead">{t('mainPage.areYouSure')}</p>
           <div className="d-flex justify-content-end">
             <Button
               type="button"
@@ -226,7 +227,7 @@ const Channels = ({ channels }) => {
               onClick={handleCloseRemoveModal}
               className="me-2"
             >
-              Отменить
+              {t('mainPage.cancel')}
             </Button>
             <Button
               type="button"
@@ -235,7 +236,7 @@ const Channels = ({ channels }) => {
               onClick={handleRemoveChannel}
               ref={deleteButtonRef}
             >
-              Удалить
+              {t('mainPage.delete')}
             </Button>
           </div>
         </Modal.Body>
@@ -264,7 +265,7 @@ const Channels = ({ channels }) => {
           {({ isSubmitting, errors, touched, handleSubmit }) => (
             <Form onSubmit={handleSubmit}>
               <Modal.Header closeButton>
-                <Modal.Title>Переименовать канал</Modal.Title>
+                <Modal.Title>{t('mainPage.renameChannel')}</Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 <Field
@@ -339,6 +340,7 @@ Messages.propTypes = {
 };
 
 const MessageForm = () => {
+  const { t } = useTranslation();
   const inputRef = useRef(null);
   const [inputValue, setInputValue] = useState("");
   const { channels, auth, messages } = useSelector((state) => {
@@ -387,7 +389,7 @@ const MessageForm = () => {
           ref={inputRef}
           name="body"
           aria-label="Новое сообщение"
-          placeholder="Введите сообщение..."
+          placeholder={t('mainPage.inputMessage')}
           type="text"
           value={inputValue}
           className="border-0 p-0 ps-2 form-control"
@@ -419,6 +421,7 @@ const MessageForm = () => {
 const NewChannelButton = () => {
   const dispatch = useDispatch();
   const newChannelFieldRef = useRef(null);
+  const { t } = useTranslation();
 
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -429,12 +432,12 @@ const NewChannelButton = () => {
 
   const NewChannelSchema = Yup.object().shape({
     channelName: Yup.string()
-      .min(3, "От 3 до 20 символов")
-      .max(20, "От 3 до 20 символов")
-      .required("Обязательное поле")
+      .min(3, t('validation.channelNameMinMax'))
+      .max(20, t('validation.channelNameMinMax'))
+      .required(t('validation.required'))
       .notOneOf(
         channels.list.map((channel) => channel.name),
-        "Должно быть уникальным"
+        t('validation.unique')
       ),
   });
 
@@ -489,7 +492,7 @@ const NewChannelButton = () => {
           {({ isSubmitting, errors, touched, handleSubmit }) => (
             <Form onSubmit={handleSubmit}>
               <Modal.Header closeButton>
-                <Modal.Title>Добавить канал</Modal.Title>
+                <Modal.Title>{t('mainPage.addChannel')}</Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 <Field
@@ -585,7 +588,7 @@ const MainPage = () => {
       <Row className="h-100 bg-white flex-md-row">
         <Col className="col-4 col-md-2 border-end px-0 bg-light flex-column h-100 d-flex">
           <div className="d-flex mt-1 justify-content-between mb-2 ps-4 pe-2 p-4">
-            <b>Каналы</b>
+            <b>{t('mainPage.channels')}</b>
             <NewChannelButton />
           </div>
 

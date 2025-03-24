@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
 import loginImage from "../../assets/loginImage.png";
@@ -23,10 +23,10 @@ const LoginForm = () => {
   const navigate = useNavigate();
   const [authError, setAuthError] = useState(null);
   const dispatch = useDispatch();
-  
-  const userData = useSelector((state) => { 
+
+  const userData = useSelector((state) => {
     console.log("СОСТЯНИЕ СЛАЙСА: ", state);
-    return state.auth
+    return state.auth;
   });
 
   const handleSubmit = async (values, { resetForm, isSubmitting }) => {
@@ -37,7 +37,7 @@ const LoginForm = () => {
       resetForm();
       window.localStorage.setItem("userId", JSON.stringify(data));
       dispatch(setCredentials(data));
-      
+
       setAuthError(null);
       logIn();
       navigate("/");
@@ -68,7 +68,7 @@ const LoginForm = () => {
             id="username"
             className={`form-control ${authError && "is-invalid"}`}
           />
-          <label htmlFor="username">Ваш ник</label>
+          <label htmlFor="username">{t('loginPage.yourName')}</label>
         </div>
         <div className="form-floating mb-3">
           <Field
@@ -80,8 +80,8 @@ const LoginForm = () => {
             id="password"
             className={`form-control ${authError && "is-invalid"}`}
           />
-          <label htmlFor="password">Пароль</label>
-          <BootstrapForm.Control.Feedback type="invalid"> 
+          <label htmlFor="password">{t('loginPage.yourPassword')}</label>
+          <BootstrapForm.Control.Feedback type="invalid">
             {authError}
           </BootstrapForm.Control.Feedback>
         </div>
@@ -93,30 +93,28 @@ const LoginForm = () => {
   );
 };
 
-const FormCard = () => {
-  return (
-    <Card className="shadow-sm">
-      <Card.Body className="row">
-        <div className="col-12 col-md-6 d-flex align-items-center justify-content-center">
-          <img src={loginImage} alt="Войти" className="rounded-circle h-50" />
-        </div>
-        <LoginForm />
-      </Card.Body>
-      <Card.Footer>
-        <span>Нет Аккаунта? </span>
-        <a href="/signup">Регистрация</a>
-      </Card.Footer>
-    </Card>
-  );
-};
-
-
 const LoginPage = () => {
+  const { t } = useTranslation();
   return (
     <Container fluid className="h-100">
       <Row className="justify-content-center align-content-center h-100">
         <Col className="col-12 col-md-8 col-xxl-6">
-          <FormCard />
+          <Card className="shadow-sm">
+            <Card.Body className="row">
+              <div className="col-12 col-md-6 d-flex align-items-center justify-content-center">
+                <img
+                  src={loginImage}
+                  alt="Войти"
+                  className="rounded-circle h-50"
+                />
+              </div>
+              <LoginForm />
+            </Card.Body>
+            <Card.Footer>
+              <span>{t('loginPage.footer')} </span>
+              <a href="/signup">{t('loginPage.registration')}</a>
+            </Card.Footer>
+          </Card>
         </Col>
       </Row>
     </Container>
@@ -124,7 +122,7 @@ const LoginPage = () => {
 };
 
 LoginPage.propTypes = {
-  location: PropTypes.object
+  location: PropTypes.object,
 };
 
 export { LoginPage };

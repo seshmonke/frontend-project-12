@@ -16,11 +16,14 @@ import { useDispatch } from "react-redux";
 import { setCredentials } from "../../slices/authSlice";
 import { useAuth } from "../../hooks";
 import { useNavigate } from "react-router-dom";
+import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 const SignUpPage = () => {
   const { loggedIn, logIn, logOut } = useAuth();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const fieldRefs = {
     username: useRef(null),
     password: useRef(null),
@@ -65,15 +68,15 @@ const SignUpPage = () => {
 
   const SignupSchema = Yup.object().shape({
     username: Yup.string()
-      .required("Обязательное поле")
-      .min(3, "От 3 до 20 символов")
-      .max(20, "От 3 до 20 символов"),
+      .required(t('validation.required'))
+      .min(3, t('validation.usernameMinMax'))
+      .max(20, t('validation.usernameMinMax')),
     password: Yup.string()
-      .required("Обязательное поле")
-      .min(6, "Минимум 6 символов"),
+      .required(t('validation.required'))
+      .min(6, t('validation.passwordMin')),
     confirmPassword: Yup.string()
-      .required("Обязательное поле")
-      .oneOf([Yup.ref("password"), null], "Пароли должны совпадать"),
+      .required(t('validation.required'))
+      .oneOf([Yup.ref("password"), null], t('validation.passwordMatch')),
   });
 
   const handleKeyDown = (event, submitForm, values, setFieldTouched) => {
@@ -125,7 +128,7 @@ const SignUpPage = () => {
               >
                 {({ isSubmitting, submitForm, values, setFieldTouched }) => (
                   <Form as={FormikForm} className="w-50">
-                    <h1 className="text-center mb-4">Регистрация</h1>
+                    <h1 className="text-center mb-4">{t('signUpPage.title')}</h1>
                     {signUpError && (
                       <div className="alert alert-danger">{signUpError}</div>
                     )}
@@ -136,10 +139,10 @@ const SignUpPage = () => {
                           controlId={fieldName}
                           label={
                             fieldName === "username"
-                              ? "Имя пользователя"
+                              ? t('signUpPage.username')
                               : fieldName === "password"
-                              ? "Пароль"
-                              : "Подтвердите пароль"
+                              ? t('signUpPage.password')
+                              : t('signUpPage.confirmPassword')
                           }
                           className="mb-3"
                         >
@@ -187,7 +190,7 @@ const SignUpPage = () => {
                       type="submit"
                       className="w-100"
                     >
-                      {isSubmitting ? "Отправка..." : "Зарегистрироваться"}
+                      {isSubmitting ? t('signUpPage.sending') : t('signUpPage.registration')}
                     </Button>
                   </Form>
                 )}
