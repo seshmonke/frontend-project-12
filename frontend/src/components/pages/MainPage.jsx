@@ -21,6 +21,11 @@ import {
 } from "react-bootstrap";
 import { Formik, Field, Form } from "formik";
 import { useTranslation } from "react-i18next";
+import { ToastContainer, toast } from "react-toastify";
+import filter from 'leo-profanity';
+
+filter.loadDictionary('ru');
+
 
 const MyIcon = () => {
   return (
@@ -100,8 +105,10 @@ const Channels = ({ channels }) => {
         "Респонс из обработчика удаления канала :",
         JSON.stringify(response)
       );
+      toast.success(t('notification.successDelete'));
     } catch (error) {
       console.error("Ошибка удаления:", error);
+      toast(error.message);
     } finally {
       setShowRemoveModal(false);
     }
@@ -130,12 +137,12 @@ const Channels = ({ channels }) => {
 
   const RenameChannelSchema = Yup.object().shape({
     channelName: Yup.string()
-      .min(3, t('validation.channelNameMinMax'))
-      .max(20, t('validation.channelNameMinMax'))
-      .required(t('validation.required'))
+      .min(3, t("validation.channelNameMinMax"))
+      .max(20, t("validation.channelNameMinMax"))
+      .required(t("validation.required"))
       .notOneOf(
         list.map((channel) => channel.name),
-        t('validation.unique')
+        t("validation.unique")
       ),
   });
 
@@ -181,7 +188,7 @@ const Channels = ({ channels }) => {
                       as="button"
                       onClick={() => handleShowRemoveModal(channel)}
                     >
-                      {t('mainPage.delete')}
+                      {t("mainPage.delete")}
                     </Dropdown.Item>
                     <Dropdown.Item
                       as="button"
@@ -189,7 +196,7 @@ const Channels = ({ channels }) => {
                         return handleShowRenameModal(channel);
                       }}
                     >
-                      {t('mainPage.rename')}
+                      {t("mainPage.rename")}
                     </Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown>
@@ -216,10 +223,10 @@ const Channels = ({ channels }) => {
         onKeyDown={handleKeyDown}
       >
         <Modal.Header closeButton>
-          <Modal.Title>{t('mainPage.deleteChannel')}</Modal.Title>
+          <Modal.Title>{t("mainPage.deleteChannel")}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p className="lead">{t('mainPage.areYouSure')}</p>
+          <p className="lead">{t("mainPage.areYouSure")}</p>
           <div className="d-flex justify-content-end">
             <Button
               type="button"
@@ -227,7 +234,7 @@ const Channels = ({ channels }) => {
               onClick={handleCloseRemoveModal}
               className="me-2"
             >
-              {t('mainPage.cancel')}
+              {t("mainPage.cancel")}
             </Button>
             <Button
               type="button"
@@ -236,7 +243,7 @@ const Channels = ({ channels }) => {
               onClick={handleRemoveChannel}
               ref={deleteButtonRef}
             >
-              {t('mainPage.delete')}
+              {t("mainPage.delete")}
             </Button>
           </div>
         </Modal.Body>
@@ -248,24 +255,31 @@ const Channels = ({ channels }) => {
           }}
           validationSchema={RenameChannelSchema}
           onSubmit={async ({ channelName: name }) => {
-            console.log("Форма отправляется");
-            const response = await axios.patch(
-              `/api/v1/channels/${selectedChannel ? selectedChannel.id : null}`,
-              { name },
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
-            console.log("РЕСПОНС ИЗМЕНЕНИЯ ИМЕНИ КАНАЛА: ", response);
-            handleCloseRenameModal();
+            try {
+              console.log("Форма отправляется");
+              const response = await axios.patch(
+                `/api/v1/channels/${
+                  selectedChannel ? selectedChannel.id : null
+                }`,
+                { name },
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+              console.log("РЕСПОНС ИЗМЕНЕНИЯ ИМЕНИ КАНАЛА: ", response);
+              handleCloseRenameModal();
+              toast.success(t('notification.successRename'));
+            } catch (error) {
+              toast(error.message);
+            }
           }}
         >
           {({ isSubmitting, errors, touched, handleSubmit }) => (
             <Form onSubmit={handleSubmit}>
               <Modal.Header closeButton>
-                <Modal.Title>{t('mainPage.renameChannel')}</Modal.Title>
+                <Modal.Title>{t("mainPage.renameChannel")}</Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 <Field
@@ -313,6 +327,16 @@ Channels.propTypes = {
 };
 
 const Messages = ({ messages }) => {
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   const state = useSelector((state) => {
     return state;
   });
@@ -326,6 +350,7 @@ const Messages = ({ messages }) => {
           </div>
         );
       })}
+      <div ref={messagesEndRef} />
     </div>
   );
 };
@@ -349,6 +374,12 @@ const MessageForm = () => {
   const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
+    if (errorMessage) {
+      toast.error(errorMessage);
+    }
+  }, [errorMessage]);
+
+  useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
@@ -359,7 +390,7 @@ const MessageForm = () => {
     if (!inputValue.trim()) return;
     const newMessage = {
       id: messages.list.length,
-      body: inputValue,
+      body: filter.clean(inputValue),
       channelId: channels.currentChannel.id,
       username: auth.username,
     };
@@ -376,8 +407,9 @@ const MessageForm = () => {
         inputRef.current.focus();
       }
       inputRef.current?.focus();
+
     } catch (error) {
-      setErrorMessage(error.message || "Ошибка при отправке сообщения");
+      setErrorMessage(error.message || t("notifications.messageError"));
     }
   };
 
@@ -389,7 +421,7 @@ const MessageForm = () => {
           ref={inputRef}
           name="body"
           aria-label="Новое сообщение"
-          placeholder={t('mainPage.inputMessage')}
+          placeholder={t("mainPage.inputMessage")}
           type="text"
           value={inputValue}
           className="border-0 p-0 ps-2 form-control"
@@ -432,12 +464,12 @@ const NewChannelButton = () => {
 
   const NewChannelSchema = Yup.object().shape({
     channelName: Yup.string()
-      .min(3, t('validation.channelNameMinMax'))
-      .max(20, t('validation.channelNameMinMax'))
-      .required(t('validation.required'))
+      .min(3, t("validation.channelNameMinMax"))
+      .max(20, t("validation.channelNameMinMax"))
+      .required(t("validation.required"))
       .notOneOf(
         channels.list.map((channel) => channel.name),
-        t('validation.unique')
+        t("validation.unique")
       ),
   });
 
@@ -463,8 +495,9 @@ const NewChannelButton = () => {
             channelName: "",
           }}
           validationSchema={NewChannelSchema}
-          onSubmit={async ({ channelName: name }) => {
+          onSubmit={async ({ channelName }) => {
             try {
+              const name = filter.clean(channelName);
               console.log("Форма отправляется");
               const response = await axios.post(
                 "/api/v1/channels",
@@ -484,15 +517,17 @@ const NewChannelButton = () => {
               );
               dispatch(setCurrentChannel(response.data));
               handleClose();
+              toast.success(t('notification.successCreate'));
             } catch (error) {
               console.log(error);
+              toast.error(error.message);
             }
           }}
         >
           {({ isSubmitting, errors, touched, handleSubmit }) => (
             <Form onSubmit={handleSubmit}>
               <Modal.Header closeButton>
-                <Modal.Title>{t('mainPage.addChannel')}</Modal.Title>
+                <Modal.Title>{t("mainPage.addChannel")}</Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 <Field
@@ -588,7 +623,7 @@ const MainPage = () => {
       <Row className="h-100 bg-white flex-md-row">
         <Col className="col-4 col-md-2 border-end px-0 bg-light flex-column h-100 d-flex">
           <div className="d-flex mt-1 justify-content-between mb-2 ps-4 pe-2 p-4">
-            <b>{t('mainPage.channels')}</b>
+            <b>{t("mainPage.channels")}</b>
             <NewChannelButton />
           </div>
 

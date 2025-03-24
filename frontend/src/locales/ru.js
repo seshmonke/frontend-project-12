@@ -46,7 +46,10 @@ export default {
         wrongCredentials: 'Неверные имя пользователя или пароль',
         error: 'Произошла ошибка. Попробуйте снова.',
         alreadyExist: 'Такой пользователь уже существует',
-        
+        messageError: 'Ошибка при отправке сообщения',
+        successCreate: 'Канал успешно создан',
+        successRename: 'Канал переименован',
+        successDelete: 'Канал удалён',
       }
     }
   };

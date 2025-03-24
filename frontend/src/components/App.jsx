@@ -1,6 +1,6 @@
 import { clearCredentials } from "../slices/authSlice.js";
 import React, { useState, useEffect } from "react";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 import {
   BrowserRouter,
   Routes,
@@ -26,8 +26,28 @@ import {
   renameChannel,
 } from "../slices/channelsSlice.js";
 import { useTranslation } from "react-i18next";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast } from "react-toastify";
+import { Provider, ErrorBoundary } from "@rollbar/react";
+import Rollbar from "rollbar";
 
+const rollbarConfig = {
+  accessToken: "25319b5d0cef45c5842b232581503f9d",
+  environment: "production",
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+};
+
+const rollbar = new Rollbar({
+  accessToken: "25319b5d0cef45c5842b232581503f9d",
+  environment: "production",
+  captureUncaught: true,
+  captureUnhandledRejections: true,
+});
+
+const TestError = () => {
+  const a = null;
+  return a.hello();
+};
 
 const AuthProvider = ({ children }) => {
   const dispatch = useDispatch();
@@ -103,12 +123,24 @@ const LogOutButton = () => {
 
   return loggedIn ? (
     <button type="button" className="btn btn-primary" onClick={logOut}>
-      {t('logoutButton')}
+      {t("logoutButton")}
     </button>
   ) : null;
 };
 
 const App = () => {
+  const handleError = (error) => {
+    rollbar.error(error); // Отправляем ошибку в Rollbar
+  };
+
+  // Пример использования
+  try {
+    // Код, который может вызвать ошибку
+    throw new Error("Это тестовая ошибка");
+  } catch (error) {
+    handleError(error);
+  }
+
   const { logOut, loggedIn } = useAuth();
   const dispatch = useDispatch();
   useSelector((state) => {
@@ -116,7 +148,7 @@ const App = () => {
     return state;
   });
   useEffect(() => {
-    console.log('logged in: ', loggedIn)
+    console.log("logged in: ", loggedIn);
     const onConnect = () => {
       console.log("Сокет подключился ура");
     };
@@ -156,40 +188,45 @@ const App = () => {
   }, []);
 
   return (
-    <AuthProvider>
-      <ToastContainer />
-      <div className="d-flex flex-column bg-white h-100">
-        <Navbar className="bg-light-subtle shadow-sm">
-          <Container>
-            <Navbar.Brand href="/">Sesh Chat</Navbar.Brand>
-            <LogOutButton />
-          </Container>
-        </Navbar>
+    <Provider config={rollbarConfig}>
+      <ErrorBoundary>
+        <AuthProvider>
+          <ToastContainer />
+          <div className="d-flex flex-column bg-white h-100">
+            <Navbar className="bg-light-subtle shadow-sm">
+              <Container>
+                <Navbar.Brand href="/">Sesh Chat</Navbar.Brand>
+                <LogOutButton />
+                <TestError />
+              </Container>
+            </Navbar>
 
-        <BrowserRouter>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <PrivateRoute>
-                  <MainPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/login"
-              element={
-                <PublicRoute>
-                  <LoginPage />
-                </PublicRoute>
-              }
-            />
-            <Route path="/signup" element={<SignUpPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </BrowserRouter>
-      </div>
-    </AuthProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <PrivateRoute>
+                      <MainPage />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/login"
+                  element={
+                    <PublicRoute>
+                      <LoginPage />
+                    </PublicRoute>
+                  }
+                />
+                <Route path="/signup" element={<SignUpPage />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </BrowserRouter>
+          </div>
+        </AuthProvider>
+      </ErrorBoundary>
+    </Provider>
   );
 };
 

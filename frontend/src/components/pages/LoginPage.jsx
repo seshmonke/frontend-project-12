@@ -36,18 +36,23 @@ const LoginForm = () => {
       usernameRef.current.focus();
       usernameRef.current.select();
     }
+
+    if (authError) {
+      toast.error(authError);
+      setAuthError(null);
+    }
   }, [authError]);
 
 
   const handleSubmit = async (values, { resetForm, isSubmitting }) => {
     try {
+      setAuthError(null);
       console.log(values);
       const response = await axios.post("/api/v1/login", values);
       const { data } = response;
       resetForm();
       window.localStorage.setItem("userId", JSON.stringify(data));
       dispatch(setCredentials(data));
-      setAuthError(null);
 
       logIn();
       navigate("/");
@@ -60,8 +65,6 @@ const LoginForm = () => {
       e.response
         ? setAuthError(t('notification.wrongCredentials'))
         : setAuthError(t('notification.error'));
-
-      toast.error(authError);
     }
   };
 
