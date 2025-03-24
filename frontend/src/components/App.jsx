@@ -31,22 +31,8 @@ import { Provider, ErrorBoundary } from "@rollbar/react";
 import Rollbar from "rollbar";
 
 const rollbarConfig = {
-  accessToken: "25319b5d0cef45c5842b232581503f9d",
-  environment: "production",
-  captureUncaught: true,
-  captureUnhandledRejections: true,
-};
-
-const rollbar = new Rollbar({
-  accessToken: "25319b5d0cef45c5842b232581503f9d",
-  environment: "production",
-  captureUncaught: true,
-  captureUnhandledRejections: true,
-});
-
-const TestError = () => {
-  const a = null;
-  return a.hello();
+  accessToken: '25319b5d0cef45c5842b232581503f9d',
+  environment: 'testenv',
 };
 
 const AuthProvider = ({ children }) => {
@@ -129,18 +115,6 @@ const LogOutButton = () => {
 };
 
 const App = () => {
-  const handleError = (error) => {
-    rollbar.error(error); // Отправляем ошибку в Rollbar
-  };
-
-  // Пример использования
-  try {
-    // Код, который может вызвать ошибку
-    throw new Error("Это тестовая ошибка");
-  } catch (error) {
-    handleError(error);
-  }
-
   const { logOut, loggedIn } = useAuth();
   const dispatch = useDispatch();
   useSelector((state) => {
@@ -197,7 +171,6 @@ const App = () => {
               <Container>
                 <Navbar.Brand href="/">Sesh Chat</Navbar.Brand>
                 <LogOutButton />
-                <TestError />
               </Container>
             </Navbar>
 
