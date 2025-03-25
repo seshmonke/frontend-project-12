@@ -18,6 +18,8 @@ import { useAuth } from "../../hooks";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ToastContainer, toast } from "react-toastify";
+import routes from '../../routes.js';
+
 
 const SignUpPage = () => {
   const { loggedIn, logIn, logOut } = useAuth();
@@ -47,7 +49,7 @@ const SignUpPage = () => {
     { resetForm, isSubmitting }
   ) => {
     try {
-      const response = await axios.post("/api/v1/signup", {
+      const response = await axios.post(routes.signupPath(), {
         username,
         password,
       });

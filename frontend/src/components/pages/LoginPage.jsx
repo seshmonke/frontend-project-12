@@ -17,6 +17,7 @@ import { setCredentials } from "../../slices/authSlice.js";
 import { useAuth } from "../../hooks/index.jsx";
 import { useTranslation } from "react-i18next";
 import { ToastContainer, toast } from "react-toastify";
+import routes from '../../routes.js';
 
 const LoginForm = () => {
   const usernameRef = useRef(null);
@@ -48,7 +49,7 @@ const LoginForm = () => {
     try {
       setAuthError(null);
       console.log(values);
-      const response = await axios.post("/api/v1/login", values);
+      const response = await axios.post(routes.loginPath(), values);
       const { data } = response;
       resetForm();
       window.localStorage.setItem("userId", JSON.stringify(data));

@@ -23,6 +23,7 @@ import { Formik, Field, Form } from "formik";
 import { useTranslation } from "react-i18next";
 import { ToastContainer, toast } from "react-toastify";
 import filter from 'leo-profanity';
+import routes from '../../routes.js';
 
 filter.loadDictionary('ru');
 
@@ -91,7 +92,8 @@ const Channels = ({ channels }) => {
 
     try {
       const response = await axios.delete(
-        `/api/v1/channels/${selectedChannel.id}`,
+        routes.channelsPath(selectedChannel.id)
+        /*`/api/v1/channels/${selectedChannel.id}`*/,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -258,9 +260,7 @@ const Channels = ({ channels }) => {
             try {
               console.log("Форма отправляется");
               const response = await axios.patch(
-                `/api/v1/channels/${
-                  selectedChannel ? selectedChannel.id : null
-                }`,
+                routes.channelsPath(selectedChannel ? selectedChannel.id : null),
                 { name },
                 {
                   headers: {
@@ -396,7 +396,7 @@ const MessageForm = () => {
     };
 
     try {
-      const response = await axios.post("/api/v1/messages", newMessage, {
+      const response = await axios.post(routes.messagesPath(), newMessage, {
         headers: {
           Authorization: `Bearer ${auth.token}`,
         },
@@ -500,7 +500,7 @@ const NewChannelButton = () => {
               const name = filter.clean(channelName);
               console.log("Форма отправляется");
               const response = await axios.post(
-                "/api/v1/channels",
+                routes.channelsPath(),
                 { name },
                 {
                   headers: {
@@ -577,12 +577,12 @@ const MainPage = () => {
     const fetchData = async () => {
       try {
         const [channelsResponse, messagesResponse] = await Promise.all([
-          axios.get("/api/v1/channels", {
+          axios.get(routes.channelsPath(), {
             headers: {
               Authorization: `Bearer ${auth.token}`,
             },
           }),
-          axios.get("/api/v1/messages", {
+          axios.get(routes.messagesPath(), {
             headers: {
               Authorization: `Bearer ${auth.token}`,
             },
