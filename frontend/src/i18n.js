@@ -5,7 +5,6 @@ import resources from './locales/index.js';
 
 const i18nInstance = i18next.createInstance();
 
-
 i18nInstance
   .use(initReactI18next) // передаем экземпляр i18n в react-i18next
   .use(LanguageDetector) // с помощью плагина определяем язык пользователя в браузере
@@ -19,6 +18,5 @@ i18nInstance
     lng: 'ru', // Set default language to Russian for testing
     compatibilityJSON: 'v3',
   });
-
 
 export default i18nInstance;
