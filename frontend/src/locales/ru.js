@@ -6,6 +6,7 @@ export default {
       logoutButton: 'Выйти',
       title: 'Hexlet Chat',
       mainPage: {
+        channelName: 'Имя канала',
         channels: 'Каналы',
         inputMessage: 'Введите сообщение...',
         addChannel: 'Добавить канал',
