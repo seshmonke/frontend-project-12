@@ -39,7 +39,6 @@ const LoginForm = () => {
     }
   }, [authError]);
 
-
   const handleSubmit = async (values, { resetForm, isSubmitting }) => {
     try {
       setAuthError(null);
@@ -69,37 +68,37 @@ const LoginForm = () => {
       initialValues={{ username: '', password: '' }}
       onSubmit={handleSubmit}
     >
-      <Form className='col-12 col-md-6 mt-3 mt-mb-0'>
-        <h1 className='text-center mb-4'>{t('loginPage.title')}</h1>
-        <div className='form-floating mb-3'>
+      <Form className="col-12 col-md-6 mt-3 mt-mb-0">
+        <h1 className="text-center mb-4">{t('loginPage.title')}</h1>
+        <div className="form-floating mb-3">
           <Field
-            type='text'
-            name='username'
-            autocomplete='username'
-            placeholder='Ваш ник'
+            type="text"
+            name="username"
+            autocomplete="username"
+            placeholder="Ваш ник"
             required
-            id='username'
+            id="username"
             className={`form-control ${authError && 'is-invalid'}`}
             innerRef={usernameRef}
           />
-          <label htmlFor='username'>{t('loginPage.yourName')}</label>
+          <label htmlFor="username">{t('loginPage.yourName')}</label>
         </div>
-        <div className='form-floating mb-3'>
+        <div className="form-floating mb-3">
           <Field
-            type='password'
-            name='password'
-            autocomplete='username'
-            placeholder='Пароль'
+            type="password"
+            name="password"
+            autocomplete="username"
+            placeholder="Пароль"
             required
-            id='password'
+            id="password"
             className={`form-control ${authError && 'is-invalid'}`}
           />
-          <label htmlFor='password'>{t('loginPage.yourPassword')}</label>
-          <BootstrapForm.Control.Feedback type='invalid'>
+          <label htmlFor="password">{t('loginPage.yourPassword')}</label>
+          <BootstrapForm.Control.Feedback type="invalid">
             {authError}
           </BootstrapForm.Control.Feedback>
         </div>
-        <Button variant='primary' type='submit' className='w-100 mb-3'>
+        <Button variant="primary" type="submit" className="w-100 mb-3">
           Войти
         </Button>
       </Form>
@@ -110,23 +109,23 @@ const LoginForm = () => {
 const LoginPage = () => {
   const { t } = useTranslation();
   return (
-    <Container fluid className='h-100'>
-      <Row className='justify-content-center align-content-center h-100'>
-        <Col className='col-12 col-md-8 col-xxl-6'>
-          <Card className='shadow-sm'>
-            <Card.Body className='row'>
-              <div className='col-12 col-md-6 d-flex align-items-center justify-content-center'>
+    <Container fluid className="h-100">
+      <Row className="justify-content-center align-content-center h-100">
+        <Col className="col-12 col-md-8 col-xxl-6">
+          <Card className="shadow-sm">
+            <Card.Body className="row">
+              <div className="col-12 col-md-6 d-flex align-items-center justify-content-center">
                 <img
                   src={loginImage}
-                  alt='Войти'
-                  className='rounded-circle h-50'
+                  alt="Войти"
+                  className="rounded-circle h-50"
                 />
               </div>
               <LoginForm />
             </Card.Body>
             <Card.Footer>
               <span>{t('loginPage.footer')}</span>
-              <a href='/signup'>{t('loginPage.registration')}</a>
+              <a href="/signup">{t('loginPage.registration')}</a>
             </Card.Footer>
           </Card>
         </Col>

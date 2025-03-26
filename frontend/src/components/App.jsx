@@ -78,7 +78,7 @@ const PrivateRoute = ({ children }) => {
   return auth.loggedIn ? (
     children
   ) : (
-    <Navigate to='/login' state={{ from: location }} />
+    <Navigate to="/login" state={{ from: location }} />
   );
 };
 
@@ -92,7 +92,7 @@ const PublicRoute = ({ children }) => {
   const location = useLocation();
 
   return auth.loggedIn ? (
-    <Navigate to='/' state={{ from: location }} />
+    <Navigate to="/" state={{ from: location }} />
   ) : (
     children
   );
@@ -107,7 +107,7 @@ const LogOutButton = () => {
   const { logOut, loggedIn } = useAuth();
 
   return loggedIn ? (
-    <button type='button' className='btn btn-primary' onClick={logOut}>
+    <button type="button" className="btn btn-primary" onClick={logOut}>
       {t('logoutButton')}
     </button>
   ) : null;
@@ -165,10 +165,10 @@ const App = () => {
       <ErrorBoundary>
         <AuthProvider>
           <ToastContainer />
-          <div className='d-flex flex-column bg-white h-100'>
-            <Navbar className='bg-light-subtle shadow-sm'>
+          <div className="d-flex flex-column bg-white h-100">
+            <Navbar className="bg-light-subtle shadow-sm">
               <Container>
-                <Navbar.Brand href='/'>{t('title')}</Navbar.Brand>
+                <Navbar.Brand href="/">{t('title')}</Navbar.Brand>
                 <LogOutButton />
               </Container>
             </Navbar>
@@ -176,23 +176,23 @@ const App = () => {
             <BrowserRouter>
               <Routes>
                 <Route
-                  path='/'
-                  element={(
+                  path="/"
+                  element={
                     <PrivateRoute>
                       <MainPage />
                     </PrivateRoute>
-                  )}
+                  }
                 />
                 <Route
-                  path='/login'
-                  element={(
+                  path="/login"
+                  element={
                     <PublicRoute>
                       <LoginPage />
                     </PublicRoute>
-                  )}
+                  }
                 />
-                <Route path='/signup' element={<SignUpPage />} />
-                <Route path='*' element={<NotFoundPage />} />
+                <Route path="/signup" element={<SignUpPage />} />
+                <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </BrowserRouter>
           </div>

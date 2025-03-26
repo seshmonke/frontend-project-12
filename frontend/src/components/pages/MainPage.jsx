@@ -31,14 +31,14 @@ filter.loadDictionary('en');
 const MyIcon = () => {
   return (
     <svg
-      xmlns='http://www.w3.org/2000/svg'
-      viewBox='0 0 16 16'
-      width='20'
-      height='20'
-      fill='currentColor'
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 16 16"
+      width="20"
+      height="20"
+      fill="currentColor"
     >
-      <path d='M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z'></path>
-      <path d='M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4'></path>
+      <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"></path>
+      <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"></path>
     </svg>
   );
 };
@@ -92,9 +92,8 @@ const Channels = ({ channels }) => {
 
     try {
       const response = await axios.delete(
-        routes.channelsPath(selectedChannel.id)
-        /*`/api/v1/channels/${selectedChannel.id}`*/,
-        {
+        routes.channelsPath(selectedChannel.id),
+        /*`/api/v1/channels/${selectedChannel.id}`*/ {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -151,9 +150,9 @@ const Channels = ({ channels }) => {
   return (
     <>
       <Nav
-        id='channels-box'
-        className='flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block'
-        as='ul'
+        id="channels-box"
+        className="flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block"
+        as="ul"
       >
         {channels.map((channel) => {
           console.log(
@@ -163,38 +162,40 @@ const Channels = ({ channels }) => {
             channel.id === currentChannel.id
           );
           return (
-            <Nav.Item className='w-100' as='li' key={channel.id}>
+            <Nav.Item className="w-100" as="li" key={channel.id}>
               {channel.removable ? (
-                <Dropdown as={ButtonGroup} className='d-flex'>
+                <Dropdown as={ButtonGroup} className="d-flex">
                   <Button
-                    type='button'
+                    type="button"
                     variant={
                       channel.id === currentChannel.id ? 'secondary' : 'light'
                     }
-                    className='w-100 rounded-0 text-start text-truncate'
+                    className="w-100 rounded-0 text-start text-truncate"
                     onClick={() => handleClick(channel)}
                     aria-label={channel.name}
                   >
-                    <span className='me-1'>#</span> {channel.name}
+                    <span className="me-1">#</span> {channel.name}
                   </Button>
 
                   <Dropdown.Toggle
                     split
-                    id='dropdown-split-basic'
+                    id="dropdown-split-basic"
                     variant={
                       channel.id === currentChannel.id ? 'secondary' : 'light'
                     }
-                  ><span className='visually-hidden'>Управление каналом</span></Dropdown.Toggle>
+                  >
+                    <span className="visually-hidden">Управление каналом</span>
+                  </Dropdown.Toggle>
 
                   <Dropdown.Menu>
                     <Dropdown.Item
-                      as='button'
+                      as="button"
                       onClick={() => handleShowRemoveModal(channel)}
                     >
                       {t('mainPage.delete')}
                     </Dropdown.Item>
                     <Dropdown.Item
-                      as='button'
+                      as="button"
                       onClick={() => {
                         return handleShowRenameModal(channel);
                       }}
@@ -206,13 +207,13 @@ const Channels = ({ channels }) => {
               ) : (
                 <Button
                   onClick={() => handleClick(channel)}
-                  type='button'
+                  type="button"
                   variant={
                     channel.id === currentChannel.id ? 'secondary' : 'light'
                   }
-                  className='w-100 rounded-0 text-start'
+                  className="w-100 rounded-0 text-start"
                 >
-                  <span className='me-1'>#</span> {channel.name}
+                  <span className="me-1">#</span> {channel.name}
                 </Button>
               )}
             </Nav.Item>
@@ -229,20 +230,20 @@ const Channels = ({ channels }) => {
           <Modal.Title>{t('mainPage.deleteChannel')}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p className='lead'>{t('mainPage.areYouSure')}</p>
-          <div className='d-flex justify-content-end'>
+          <p className="lead">{t('mainPage.areYouSure')}</p>
+          <div className="d-flex justify-content-end">
             <Button
-              type='button'
-              variant='secondary'
+              type="button"
+              variant="secondary"
               onClick={handleCloseRemoveModal}
-              className='me-2'
+              className="me-2"
             >
               {t('mainPage.cancel')}
             </Button>
             <Button
-              type='button'
+              type="button"
               autoFocus
-              variant='danger'
+              variant="danger"
               onClick={handleRemoveChannel}
               ref={deleteButtonRef}
             >
@@ -261,7 +262,9 @@ const Channels = ({ channels }) => {
             try {
               console.log('Форма отправляется');
               const response = await axios.patch(
-                routes.channelsPath(selectedChannel ? selectedChannel.id : null),
+                routes.channelsPath(
+                  selectedChannel ? selectedChannel.id : null
+                ),
                 { name },
                 {
                   headers: {
@@ -284,8 +287,8 @@ const Channels = ({ channels }) => {
               </Modal.Header>
               <Modal.Body>
                 <Field
-                  id='channelName'
-                  name='channelName'
+                  id="channelName"
+                  name="channelName"
                   className={`form-control ${
                     errors.channelName && touched.channelName
                       ? 'is-invalid'
@@ -294,21 +297,23 @@ const Channels = ({ channels }) => {
                   validateOnBlur
                   innerRef={renameInputRef}
                 />
-                <label className='visually-hidden' htmlFor='channelName'>{t('mainPage.channelName')}</label>
+                <label className="visually-hidden" htmlFor="channelName">
+                  {t('mainPage.channelName')}
+                </label>
                 {errors.channelName && touched.channelName ? (
                   <BootstrapForm.Control.Feedback
-                    type='invalid'
-                    className='d-block'
+                    type="invalid"
+                    className="d-block"
                   >
                     {errors.channelName}
                   </BootstrapForm.Control.Feedback>
                 ) : null}
               </Modal.Body>
               <Modal.Footer>
-                <Button variant='secondary' onClick={handleCloseRenameModal}>
+                <Button variant="secondary" onClick={handleCloseRenameModal}>
                   Отменить
                 </Button>
-                <Button type='submit' variant='primary' disabled={isSubmitting}>
+                <Button type="submit" variant="primary" disabled={isSubmitting}>
                   {isSubmitting ? 'Отправка...' : 'Отправить'}
                 </Button>
               </Modal.Footer>
@@ -340,10 +345,10 @@ const Messages = ({ messages }) => {
   }, [messages]);
 
   return (
-    <div id='messages-box' className='chat-messages overflow-auto px-5'>
+    <div id="messages-box" className="chat-messages overflow-auto px-5">
       {messages.map((message, index) => {
         return (
-          <div className='text-break mb-2' key={index}>
+          <div className="text-break mb-2" key={index}>
             <b>{message.username}</b>: {message.body}
           </div>
         );
@@ -405,45 +410,44 @@ const MessageForm = () => {
         inputRef.current.focus();
       }
       inputRef.current?.focus();
-
     } catch (error) {
       setErrorMessage(error.message || t('notifications.messageError'));
     }
   };
 
   return (
-    <BootstrapForm className='py-1 border rounded-2' onSubmit={handleSubmit}>
-      <BootstrapForm.Group className='input-group has-validation'>
+    <BootstrapForm className="py-1 border rounded-2" onSubmit={handleSubmit}>
+      <BootstrapForm.Group className="input-group has-validation">
         <BootstrapForm.Control
-          autoComplete='off'
+          autoComplete="off"
           ref={inputRef}
-          name='body'
-          aria-label='Новое сообщение'
+          name="body"
+          aria-label="Новое сообщение"
           placeholder={t('mainPage.inputMessage')}
-          type='text'
+          type="text"
           value={inputValue}
-          className='border-0 p-0 ps-2 form-control'
+          className="border-0 p-0 ps-2 form-control"
           onChange={(e) => setInputValue(e.target.value)}
         />
-        <button className='btn btn-group-vertical'>
+        <button className="btn btn-group-vertical">
           <svg
-            type='submit'
+            type="submit"
             disabled
-            xmlns='http://www.w3.org/2000/svg'
-            viewBox='0 0 16 16'
-            width='20'
-            height='20'
-            fill='currentColor'
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            width="20"
+            height="20"
+            fill="currentColor"
           >
             <path
-              fillRule='evenodd'
-              d='M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm4.5 5.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z'
+              fillRule="evenodd"
+              d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm4.5 5.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"
             ></path>
           </svg>
-          <span className='visually-hidden'>Отправить</span>
+          <span className="visually-hidden">Отправить</span>
         </button>
       </BootstrapForm.Group>
-      {errorMessage && <div className='text-danger'>{errorMessage}</div>}
+      {errorMessage && <div className="text-danger">{errorMessage}</div>}
     </BootstrapForm>
   );
 };
@@ -480,11 +484,11 @@ const NewChannelButton = () => {
   return (
     <>
       <button
-        className='p-0 text-primary btn btn-group-vertical'
+        className="p-0 text-primary btn btn-group-vertical"
         onClick={handleShow}
       >
         <MyIcon />
-        <span className='visually-hidden'>+</span>
+        <span className="visually-hidden">+</span>
       </button>
 
       <Modal show={show} onHide={handleClose} centered>
@@ -529,8 +533,8 @@ const NewChannelButton = () => {
               </Modal.Header>
               <Modal.Body>
                 <Field
-                  id='channelName'
-                  name='channelName'
+                  id="channelName"
+                  name="channelName"
                   className={`form-control ${
                     errors.channelName && touched.channelName
                       ? 'is-invalid'
@@ -539,21 +543,23 @@ const NewChannelButton = () => {
                   validateOnBlur
                   innerRef={newChannelFieldRef}
                 />
-                <label className='visually-hidden' htmlFor='channelName'>{t('mainPage.channelName')}</label>
+                <label className="visually-hidden" htmlFor="channelName">
+                  {t('mainPage.channelName')}
+                </label>
                 {errors.channelName && touched.channelName ? (
                   <BootstrapForm.Control.Feedback
-                    type='invalid'
-                    className='d-block'
+                    type="invalid"
+                    className="d-block"
                   >
                     {errors.channelName}
                   </BootstrapForm.Control.Feedback>
                 ) : null}
               </Modal.Body>
               <Modal.Footer>
-                <Button variant='secondary' onClick={handleClose}>
+                <Button variant="secondary" onClick={handleClose}>
                   Отменить
                 </Button>
-                <Button type='submit' variant='primary' disabled={isSubmitting}>
+                <Button type="submit" variant="primary" disabled={isSubmitting}>
                   {isSubmitting ? 'Отправка...' : 'Отправить'}
                 </Button>
               </Modal.Footer>
@@ -618,23 +624,23 @@ const MainPage = () => {
   );
 
   return (
-    <Container className='h-100 my-4 overflow-hidden rounded shadow'>
-      <Row className='h-100 bg-white flex-md-row'>
-        <Col className='col-4 col-md-2 border-end px-0 bg-light flex-column h-100 d-flex'>
-          <div className='d-flex mt-1 justify-content-between mb-2 ps-4 pe-2 p-4'>
+    <Container className="h-100 my-4 overflow-hidden rounded shadow">
+      <Row className="h-100 bg-white flex-md-row">
+        <Col className="col-4 col-md-2 border-end px-0 bg-light flex-column h-100 d-flex">
+          <div className="d-flex mt-1 justify-content-between mb-2 ps-4 pe-2 p-4">
             <b>{t('mainPage.channels')}</b>
             <NewChannelButton />
           </div>
 
           <Channels channels={channels.list} />
         </Col>
-        <Col className='p-0 h-100 '>
-          <div className='d-flex flex-column h-100'>
-            <div className='bg-light mb-4 p-3 shadow-sm small'>
-              <p className='m-0'>
+        <Col className="p-0 h-100 ">
+          <div className="d-flex flex-column h-100">
+            <div className="bg-light mb-4 p-3 shadow-sm small">
+              <p className="m-0">
                 <b># {currentChannelName}</b>
               </p>
-              <span className='text-muted'>
+              <span className="text-muted">
                 {t('mainPage.messages', {
                   count: channelMessages.filter(
                     (message) => message.channelId === currentChannel.id
@@ -645,7 +651,7 @@ const MainPage = () => {
 
             <Messages messages={channelMessages} />
 
-            <div className='mt-auto px-5 py-3'>
+            <div className="mt-auto px-5 py-3">
               <MessageForm />
             </div>
           </div>

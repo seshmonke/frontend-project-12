@@ -20,7 +20,6 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import routes from '../../routes.js';
 
-
 const SignUpPage = () => {
   const { logIn } = useAuth();
   const dispatch = useDispatch();
@@ -42,7 +41,6 @@ const SignUpPage = () => {
       toast.error(signUpError);
     }
   }, [signUpError]);
-
 
   const handleSubmit = async (
     { username, password },
@@ -113,16 +111,16 @@ const SignUpPage = () => {
   };
 
   return (
-    <Container fluid className='h-100'>
-      <Row className='justify-content-center align-content-center h-100'>
+    <Container fluid className="h-100">
+      <Row className="justify-content-center align-content-center h-100">
         <Col xs={12} md={8} xxl={6}>
-          <Card className='shadow-sm'>
-            <Card.Body className='d-flex flex-column flex-md-row justify-content-around align-items-center p-5'>
+          <Card className="shadow-sm">
+            <Card.Body className="d-flex flex-column flex-md-row justify-content-around align-items-center p-5">
               <div>
                 <img
                   src={signUpImage}
-                  className='rounded-circle h-50'
-                  alt='Регистрация'
+                  className="rounded-circle h-50"
+                  alt="Регистрация"
                 />
               </div>
               <Formik
@@ -135,12 +133,12 @@ const SignUpPage = () => {
                 validationSchema={SignupSchema}
               >
                 {({ isSubmitting, submitForm, values, setFieldTouched }) => (
-                  <Form as={FormikForm} className='w-50'>
-                    <h1 className='text-center mb-4'>
+                  <Form as={FormikForm} className="w-50">
+                    <h1 className="text-center mb-4">
                       {t('signUpPage.title')}
                     </h1>
                     {signUpError && (
-                      <div className='alert alert-danger'>{signUpError}</div>
+                      <div className="alert alert-danger">{signUpError}</div>
                     )}
                     {Object.keys(fieldRefs).map((fieldName) => {
                       return (
@@ -154,7 +152,7 @@ const SignUpPage = () => {
                               ? t('signUpPage.password')
                               : t('signUpPage.confirmPassword')
                           }
-                          className='mb-3'
+                          className="mb-3"
                         >
                           <Field name={fieldName}>
                             {({ field, meta }) => (
@@ -186,7 +184,7 @@ const SignUpPage = () => {
                                     )
                                   }
                                 />
-                                <Form.Control.Feedback type='invalid' tooltip>
+                                <Form.Control.Feedback type="invalid" tooltip>
                                   {meta.touched && meta.error}
                                 </Form.Control.Feedback>
                               </>
@@ -196,9 +194,9 @@ const SignUpPage = () => {
                       );
                     })}
                     <Button
-                      variant='outline-primary'
-                      type='submit'
-                      className='w-100'
+                      variant="outline-primary"
+                      type="submit"
+                      className="w-100"
                     >
                       {isSubmitting
                         ? t('signUpPage.sending')
