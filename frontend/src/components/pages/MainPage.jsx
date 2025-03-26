@@ -531,8 +531,8 @@ const NewChannelButton = () => {
               </Modal.Header>
               <Modal.Body>
                 <Field
-                  id="name"
-                  name="name" //Тут изменения было channelName
+                  id="channelName"
+                  name="channelName"
                   className={`form-control ${
                     errors.channelName && touched.channelName
                       ? "is-invalid"
@@ -541,7 +541,7 @@ const NewChannelButton = () => {
                   validateOnBlur
                   innerRef={newChannelFieldRef}
                 />
-                <label className="visually-hidden" htmlFor="name">{t('mainPage.channelName')}</label>
+                <label className="visually-hidden" htmlFor="channelName">{t('mainPage.channelName')}</label>
                 {errors.channelName && touched.channelName ? (
                   <BootstrapForm.Control.Feedback
                     type="invalid"
