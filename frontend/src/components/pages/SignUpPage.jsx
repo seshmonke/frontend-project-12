@@ -84,7 +84,7 @@ const SignUpPage = () => {
       .min(6, t("validation.passwordMinAlt")),
     confirmPassword: Yup.string()
       .required(t("validation.required"))
-      .oneOf([Yup.ref("password"), null], t("validation.required")),
+      .oneOf([Yup.ref("password"), null], t("validation.passwordMatch")),
   });
 
   const handleKeyDown = (event, submitForm, values, setFieldTouched) => {
