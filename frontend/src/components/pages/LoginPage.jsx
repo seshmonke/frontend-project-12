@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
-import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
-import { Formik, Field, Form } from "formik";
-import loginImage from "../../assets/loginImage.png";
+import React, { useEffect, useRef, useState } from 'react';
+import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
+import { Formik, Field, Form } from 'formik';
+import loginImage from '../../assets/loginImage.png';
 import {
   Button,
   Container,
@@ -10,13 +10,13 @@ import {
   Col,
   Card,
   Form as BootstrapForm,
-} from "react-bootstrap";
-import axios from "axios";
-import { useDispatch } from "react-redux";
-import { setCredentials } from "../../slices/authSlice.js";
-import { useAuth } from "../../hooks/index.jsx";
-import { useTranslation } from "react-i18next";
-import { toast } from "react-toastify";
+} from 'react-bootstrap';
+import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { setCredentials } from '../../slices/authSlice.js';
+import { useAuth } from '../../hooks/index.jsx';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 import routes from '../../routes.js';
 
 const LoginForm = () => {
@@ -47,15 +47,15 @@ const LoginForm = () => {
       const response = await axios.post(routes.loginPath(), values);
       const { data } = response;
       resetForm();
-      window.localStorage.setItem("userId", JSON.stringify(data));
+      window.localStorage.setItem('userId', JSON.stringify(data));
       dispatch(setCredentials(data));
 
       logIn();
-      navigate("/");
-      console.log("getItem", window.localStorage.getItem("userId"));
-      console.log("response", response, "isSubmitting", isSubmitting);
+      navigate('/');
+      console.log('getItem', window.localStorage.getItem('userId'));
+      console.log('response', response, 'isSubmitting', isSubmitting);
     } catch (e) {
-      console.log("error", e);
+      console.log('error', e);
       //toast(e.message);
 
       e.response
@@ -66,40 +66,40 @@ const LoginForm = () => {
 
   return (
     <Formik
-      initialValues={{ username: "", password: "" }}
+      initialValues={{ username: '', password: '' }}
       onSubmit={handleSubmit}
     >
-      <Form className="col-12 col-md-6 mt-3 mt-mb-0">
-        <h1 className="text-center mb-4">{t("loginPage.title")}</h1>
-        <div className="form-floating mb-3">
+      <Form className='col-12 col-md-6 mt-3 mt-mb-0'>
+        <h1 className='text-center mb-4'>{t('loginPage.title')}</h1>
+        <div className='form-floating mb-3'>
           <Field
-            type="text"
-            name="username"
-            autocomplete="username"
-            placeholder="Ваш ник"
+            type='text'
+            name='username'
+            autocomplete='username'
+            placeholder='Ваш ник'
             required
-            id="username"
-            className={`form-control ${authError && "is-invalid"}`}
+            id='username'
+            className={`form-control ${authError && 'is-invalid'}`}
             innerRef={usernameRef}
           />
-          <label htmlFor="username">{t("loginPage.yourName")}</label>
+          <label htmlFor='username'>{t('loginPage.yourName')}</label>
         </div>
-        <div className="form-floating mb-3">
+        <div className='form-floating mb-3'>
           <Field
-            type="password"
-            name="password"
-            autocomplete="username"
-            placeholder="Пароль"
+            type='password'
+            name='password'
+            autocomplete='username'
+            placeholder='Пароль'
             required
-            id="password"
-            className={`form-control ${authError && "is-invalid"}`}
+            id='password'
+            className={`form-control ${authError && 'is-invalid'}`}
           />
-          <label htmlFor="password">{t("loginPage.yourPassword")}</label>
-          <BootstrapForm.Control.Feedback type="invalid">
+          <label htmlFor='password'>{t('loginPage.yourPassword')}</label>
+          <BootstrapForm.Control.Feedback type='invalid'>
             {authError}
           </BootstrapForm.Control.Feedback>
         </div>
-        <Button variant="primary" type="submit" className="w-100 mb-3">
+        <Button variant='primary' type='submit' className='w-100 mb-3'>
           Войти
         </Button>
       </Form>
@@ -110,23 +110,23 @@ const LoginForm = () => {
 const LoginPage = () => {
   const { t } = useTranslation();
   return (
-    <Container fluid className="h-100">
-      <Row className="justify-content-center align-content-center h-100">
-        <Col className="col-12 col-md-8 col-xxl-6">
-          <Card className="shadow-sm">
-            <Card.Body className="row">
-              <div className="col-12 col-md-6 d-flex align-items-center justify-content-center">
+    <Container fluid className='h-100'>
+      <Row className='justify-content-center align-content-center h-100'>
+        <Col className='col-12 col-md-8 col-xxl-6'>
+          <Card className='shadow-sm'>
+            <Card.Body className='row'>
+              <div className='col-12 col-md-6 d-flex align-items-center justify-content-center'>
                 <img
                   src={loginImage}
-                  alt="Войти"
-                  className="rounded-circle h-50"
+                  alt='Войти'
+                  className='rounded-circle h-50'
                 />
               </div>
               <LoginForm />
             </Card.Body>
             <Card.Footer>
-              <span>{t("loginPage.footer")}</span>
-              <a href="/signup">{t("loginPage.registration")}</a>
+              <span>{t('loginPage.footer')}</span>
+              <a href='/signup'>{t('loginPage.registration')}</a>
             </Card.Footer>
           </Card>
         </Col>
