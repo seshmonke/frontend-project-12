@@ -158,7 +158,7 @@ const App = () => {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
     };
-  });
+  }, []);
 
   return (
     <Provider config={rollbarConfig}>
