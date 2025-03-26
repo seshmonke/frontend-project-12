@@ -4,6 +4,7 @@ import { renameChannel } from "../slices/channelsSlice";
 export default {
     translation: {
       logoutButton: 'Выйти',
+      title: 'Hexlet Chat',
       mainPage: {
         channels: 'Каналы',
         inputMessage: 'Введите сообщение...',

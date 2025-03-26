@@ -115,6 +115,7 @@ const LogOutButton = () => {
 };
 
 const App = () => {
+  const { t } = useTranslation();
   const { logOut, loggedIn } = useAuth();
   const dispatch = useDispatch();
   useSelector((state) => {
@@ -169,7 +170,7 @@ const App = () => {
           <div className="d-flex flex-column bg-white h-100">
             <Navbar className="bg-light-subtle shadow-sm">
               <Container>
-                <Navbar.Brand href="/">Sesh Chat</Navbar.Brand>
+                <Navbar.Brand href="/">{t('title')}</Navbar.Brand>
                 <LogOutButton />
               </Container>
             </Navbar>
