@@ -294,6 +294,7 @@ const Channels = ({ channels }) => {
                   validateOnBlur
                   innerRef={renameInputRef}
                 />
+                <label className="visually-hidden" htmlFor="channelName">{t('mainPage.channelName')}</label>
                 {errors.channelName && touched.channelName ? (
                   <BootstrapForm.Control.Feedback
                     type="invalid"
