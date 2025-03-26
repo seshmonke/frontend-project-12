@@ -174,7 +174,7 @@ const Channels = ({ channels }) => {
                     className="w-100 rounded-0 text-start text-truncate"
                     onClick={() => handleClick(channel)}
                   >
-                    <span className="me-1">#</span> {channel.name}
+                    <span className="me-1"># </span>{channel.name}
                   </Button>
 
                   <Dropdown.Toggle
