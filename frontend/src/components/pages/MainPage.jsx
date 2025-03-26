@@ -531,8 +531,8 @@ const NewChannelButton = () => {
               </Modal.Header>
               <Modal.Body>
                 <Field
-                  id="channelName"
-                  name="channelName"
+                  id="name"
+                  name="name" //Тут изменения было channelName
                   className={`form-control ${
                     errors.channelName && touched.channelName
                       ? "is-invalid"
