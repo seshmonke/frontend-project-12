@@ -7,16 +7,16 @@ import {
   useLocation,
   Navigate,
 } from 'react-router-dom';
-import { NotFoundPage } from './pages/NotFoundPage.jsx';
-import { LoginPage } from './pages/LoginPage.jsx';
-import { MainPage } from './pages/MainPage.jsx';
-import { SignUpPage } from './pages/SignUpPage.jsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 import { AuthContext } from '../contexts/index.jsx';
 import { useAuth } from '../hooks/index.jsx';
 import { useSelector, useDispatch } from 'react-redux';
+import { NotFoundPage } from './pages/NotFoundPage.jsx';
+import { LoginPage } from './pages/LoginPage.jsx';
+import { MainPage } from './pages/MainPage.jsx';
+import { SignUpPage } from './pages/SignUpPage.jsx';
 import socket from '../services/socket.js';
 import { clearCredentials } from '../slices/authSlice.js';
 import { addNewMessage } from '../slices/messagesSlice.js';
