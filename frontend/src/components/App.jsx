@@ -26,9 +26,8 @@ import {
   renameChannel,
 } from "../slices/channelsSlice.js";
 import { useTranslation } from "react-i18next";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import { Provider, ErrorBoundary } from "@rollbar/react";
-import Rollbar from "rollbar";
 
 const rollbarConfig = {
   accessToken: '25319b5d0cef45c5842b232581503f9d',
@@ -116,7 +115,7 @@ const LogOutButton = () => {
 
 const App = () => {
   const { t } = useTranslation();
-  const { logOut, loggedIn } = useAuth();
+  const { loggedIn } = useAuth();
   const dispatch = useDispatch();
   useSelector((state) => {
     console.log("Состояние из стора", state);

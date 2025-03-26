@@ -21,7 +21,7 @@ import {
 } from "react-bootstrap";
 import { Formik, Field, Form } from "formik";
 import { useTranslation } from "react-i18next";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import filter from 'leo-profanity';
 import routes from '../../routes.js';
 
@@ -339,10 +339,6 @@ const Messages = ({ messages }) => {
     scrollToBottom();
   }, [messages]);
 
-  const state = useSelector((state) => {
-    return state;
-  });
-
   return (
     <div id="messages-box" className="chat-messages overflow-auto px-5">
       {messages.map((message, index) => {
@@ -398,7 +394,7 @@ const MessageForm = () => {
     };
 
     try {
-      const response = await axios.post(routes.messagesPath(), newMessage, {
+      await axios.post(routes.messagesPath(), newMessage, {
         headers: {
           Authorization: `Bearer ${auth.token}`,
         },

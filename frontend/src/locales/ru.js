@@ -1,6 +1,3 @@
-import { LoginPage } from "../components/pages/LoginPage";
-import { renameChannel } from "../slices/channelsSlice";
-
 export default {
     translation: {
       logoutButton: 'Выйти',

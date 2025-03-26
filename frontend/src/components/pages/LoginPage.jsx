@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
 import loginImage from "../../assets/loginImage.png";
 import {
@@ -12,25 +12,20 @@ import {
   Form as BootstrapForm,
 } from "react-bootstrap";
 import axios from "axios";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setCredentials } from "../../slices/authSlice.js";
 import { useAuth } from "../../hooks/index.jsx";
 import { useTranslation } from "react-i18next";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import routes from '../../routes.js';
 
 const LoginForm = () => {
   const usernameRef = useRef(null);
   const { t } = useTranslation();
-  const { loggedIn, logIn, logOut } = useAuth();
+  const { logIn } = useAuth();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [authError, setAuthError] = useState(null);
-
-  const userData = useSelector((state) => {
-    console.log("СОСТЯНИЕ СЛАЙСА: ", state);
-    return state.auth;
-  });
 
   useEffect(() => {
     if (authError && usernameRef.current) {
