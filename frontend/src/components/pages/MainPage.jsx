@@ -174,7 +174,7 @@ const Channels = ({ channels }) => {
                     className="w-100 rounded-0 text-start text-truncate"
                     onClick={() => handleClick(channel)}
                   >
-                    {channel.name}
+                    <span className="me-1">#</span> {channel.name}
                   </Button>
 
                   <Dropdown.Toggle
@@ -183,7 +183,7 @@ const Channels = ({ channels }) => {
                     variant={
                       channel.id === currentChannel.id ? "secondary" : "light"
                     }
-                  />
+                  ><span className="visually-hidden">Управление каналом</span></Dropdown.Toggle>
 
                   <Dropdown.Menu>
                     <Dropdown.Item
