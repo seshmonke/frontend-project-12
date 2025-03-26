@@ -41,6 +41,7 @@ export default {
         required: 'Обязательное поле',
         unique: 'Должно быть уникальным',
         passwordMin: 'Минимум 6 символов',
+        passwordMinAlt: 'Не менее 6 символов',
         passwordMatch: 'Пароли должны совпадать'
       },
       notification: {
