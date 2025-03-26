@@ -50,7 +50,7 @@ export default {
         error: 'Произошла ошибка. Попробуйте снова.',
         alreadyExist: 'Такой пользователь уже существует',
         messageError: 'Ошибка при отправке сообщения',
-        successCreate: 'Канал успешно создан',
+        successCreate: 'Канал создан',
         successRename: 'Канал переименован',
         successDelete: 'Канал удалён',
       }
