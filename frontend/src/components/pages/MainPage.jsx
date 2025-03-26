@@ -26,7 +26,7 @@ import filter from 'leo-profanity';
 import routes from '../../routes.js';
 
 filter.loadDictionary('ru');
-
+filter.loadDictionary('en');
 
 const MyIcon = () => {
   return (
