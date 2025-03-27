@@ -18,4 +18,16 @@ export default [
   { languageOptions: { globals: globals.browser } },
   ...compat.extends('airbnb'),
   pluginReactConfig,
+  {
+    rules: {
+      'comma-dangle': [
+        'error', // Уровень ошибки
+        {
+          objects: 'always-multiline', // Запятая после последнего элемента в многострочном объекте
+          arrays: 'always-multiline', // Запятая после последнего элемента в многострочном массиве
+          functions: 'never', // Запятая не требуется в параметрах функции
+        },
+      ],
+    },
+  },
 ];

@@ -4,4 +4,4 @@ import { AuthContext } from '../contexts/index.jsx';
 
 const useAuth = () => useContext(AuthContext);
 
-export { useAuth };
+export default useAuth;

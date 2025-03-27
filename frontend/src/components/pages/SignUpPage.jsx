@@ -1,4 +1,11 @@
 import React, { useRef, useEffect, useState } from 'react';
+import * as Yup from 'yup';
+import { Formik, Field, Form as FormikForm } from 'formik';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
 import {
   Container,
   Row,
@@ -8,16 +15,9 @@ import {
   FloatingLabel,
   Button,
 } from 'react-bootstrap';
-import * as Yup from 'yup';
 import signUpImage from '../../assets/signUpImage.png';
-import { Formik, Field, Form as FormikForm } from 'formik';
-import axios from 'axios';
-import { useDispatch } from 'react-redux';
 import { setCredentials } from '../../slices/authSlice';
 import { useAuth } from '../../hooks';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { toast } from 'react-toastify';
 import routes from '../../routes.js';
 
 const SignUpPage = () => {

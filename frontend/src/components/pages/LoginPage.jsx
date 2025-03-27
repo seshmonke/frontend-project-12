@@ -2,11 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import PropTypes from 'prop-types';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Formik, Field, Form } from 'formik';
-import loginImage from '../../assets/loginImage.png';
 import {
   Button,
   Container,
@@ -15,6 +13,7 @@ import {
   Card,
   Form as BootstrapForm,
 } from 'react-bootstrap';
+import loginImage from '../../assets/loginImage.png';
 import { setCredentials } from '../../slices/authSlice.js';
 import { useAuth } from '../../hooks/index.jsx';
 import routes from '../../routes.js';
@@ -54,9 +53,6 @@ const LoginForm = () => {
       console.log('getItem', window.localStorage.getItem('userId'));
       console.log('response', response, 'isSubmitting', isSubmitting);
     } catch (e) {
-      console.log('error', e);
-
-
       setAuthError(t(e.response ? 'notification.wrongCredentials' : 'notification.error'));
     }
   };

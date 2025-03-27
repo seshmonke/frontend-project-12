@@ -28,20 +28,18 @@ import routes from '../../routes.js';
 filter.loadDictionary('ru');
 filter.loadDictionary('en');
 
-const MyIcon = () => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 16 16"
-      width="20"
-      height="20"
-      fill="currentColor"
-    >
-      <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z" />
-      <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
-    </svg>
-  );
-};
+const MyIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 16 16"
+    width="20"
+    height="20"
+    fill="currentColor"
+  >
+    <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z" />
+    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+  </svg>
+);
 
 const Channels = ({ channels }) => {
   const { t } = useTranslation();
@@ -83,9 +81,9 @@ const Channels = ({ channels }) => {
     if (!selectedChannel) return;
 
     try {
-      const response = await axios.delete(
+      await axios.delete(
         routes.channelsPath(selectedChannel.id),
-        /*`/api/v1/channels/${selectedChannel.id}`*/ {
+        {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -94,13 +92,8 @@ const Channels = ({ channels }) => {
       const [generalChannel] = list;
       dispatch(removeChannelMessages(selectedChannel));
       dispatch(setCurrentChannel(generalChannel));
-      console.log(
-        'Респонс из обработчика удаления канала :',
-        JSON.stringify(response)
-      );
       toast.success(t('notification.successDelete'));
     } catch (error) {
-      console.error('Ошибка удаления:', error);
       toast(error.message);
     } finally {
       setShowRemoveModal(false);
@@ -147,12 +140,6 @@ const Channels = ({ channels }) => {
         as="ul"
       >
         {channels.map((channel) => {
-          console.log(
-            'Отображение канала: ',
-            JSON.stringify(channel.id),
-            JSON.stringify(currentChannel.id),
-            channel.id === currentChannel.id
-          );
           return (
             <Nav.Item className="w-100" as="li" key={channel.id}>
               {channel.removable ? (

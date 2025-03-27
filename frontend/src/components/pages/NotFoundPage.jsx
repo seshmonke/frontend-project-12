@@ -2,8 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import notFoundImage from '../../assets/notFoundImage.png';
 
-const NotFoundPage = () => {
-  return (
+const NotFoundPage = () => (
     <div className="text-center">
       <img
         src={notFoundImage}
@@ -17,6 +16,5 @@ const NotFoundPage = () => {
       </p>
     </div>
   );
-};
 
-export { NotFoundPage };
+export default NotFoundPage;
