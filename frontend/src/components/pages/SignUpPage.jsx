@@ -175,12 +175,14 @@ const SignUpPage = () => {
                                   }
                                   isInvalid={meta.touched && !!meta.error}
                                   ref={fieldRefs[fieldName]}
-                                  onKeyDown={(e) => handleKeyDown(
+                                  onKeyDown={(e) =>
+                                    handleKeyDown(
                                       e,
                                       submitForm,
                                       values,
                                       setFieldTouched,
-                                    )}
+                                    )
+                                  }
                                 />
                                 <Form.Control.Feedback type="invalid" tooltip>
                                   {meta.touched && meta.error}
