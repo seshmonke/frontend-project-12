@@ -15,7 +15,7 @@ import {
 } from 'react-bootstrap';
 import loginImage from '../../assets/loginImage.png';
 import { setCredentials } from '../../slices/authSlice.js';
-import { useAuth } from '../../hooks/index.jsx';
+import useAuth from '../../hooks/index.jsx';
 import routes from '../../routes.js';
 
 const LoginForm = () => {

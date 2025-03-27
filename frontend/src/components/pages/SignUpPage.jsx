@@ -17,7 +17,7 @@ import {
 } from 'react-bootstrap';
 import signUpImage from '../../assets/signUpImage.png';
 import { setCredentials } from '../../slices/authSlice';
-import { useAuth } from '../../hooks';
+import useAuth from '../../hooks';
 import routes from '../../routes.js';
 
 const SignUpPage = () => {
