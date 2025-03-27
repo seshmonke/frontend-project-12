@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { createSlice } from '@reduxjs/toolkit';
 
 const credentials = JSON.parse(window.localStorage.getItem('userId')) || {};

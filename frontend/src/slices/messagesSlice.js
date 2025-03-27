@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = { list: [] };
@@ -14,7 +15,6 @@ const messagesSlice = createSlice({
     },
     removeChannelMessages: (state, action) => {
       state.list = state.list.filter((message) => message.channelId !== action.payload.id);
-      console.log('ПЭЙЛОУД УДАЛЕНИЯ СООБЩЕНИЙ: ', JSON.stringify(action.payload), 'СОСТОЯНИЕ СЛАЙСА СООБЩЕНИЙ', JSON.stringify(state));
     },
   },
 
