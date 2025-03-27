@@ -81,14 +81,11 @@ const Channels = ({ channels }) => {
     if (!selectedChannel) return;
 
     try {
-      await axios.delete(
-        routes.channelsPath(selectedChannel.id),
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await axios.delete(routes.channelsPath(selectedChannel.id), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const [generalChannel] = list;
       dispatch(removeChannelMessages(selectedChannel));
       dispatch(setCurrentChannel(generalChannel));
@@ -128,7 +125,7 @@ const Channels = ({ channels }) => {
       .required(t('validation.required'))
       .notOneOf(
         list.map((channel) => channel.name),
-        t('validation.unique')
+        t('validation.unique'),
       ),
   });
 
@@ -242,14 +239,14 @@ const Channels = ({ channels }) => {
               console.log('Форма отправляется');
               const response = await axios.patch(
                 routes.channelsPath(
-                  selectedChannel ? selectedChannel.id : null
+                  selectedChannel ? selectedChannel.id : null,
                 ),
                 { name },
                 {
                   headers: {
                     Authorization: `Bearer ${token}`,
                   },
-                }
+                },
               );
               console.log('РЕСПОНС ИЗМЕНЕНИЯ ИМЕНИ КАНАЛА: ', response);
               handleCloseRenameModal();
@@ -308,7 +305,7 @@ Channels.propTypes = {
   channels: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired, // Указываем, что name должен быть строкой и является обязательным
-    })
+    }),
   ).isRequired, // Указываем, что channels является обязательным массивом
 };
 
@@ -342,7 +339,7 @@ Messages.propTypes = {
     PropTypes.shape({
       name: PropTypes.string.isRequired, // Указываем, что name должен быть строкой и является обязательным
       content: PropTypes.string.isRequired, // Указываем, что content должен быть строкой и является обязательным
-    })
+    }),
   ).isRequired, // Указываем, что messages является обязательным массивом
 };
 
@@ -450,7 +447,7 @@ const NewChannelButton = () => {
       .required(t('validation.required'))
       .notOneOf(
         channels.list.map((channel) => channel.name),
-        t('validation.unique')
+        t('validation.unique'),
       ),
   });
 
@@ -487,14 +484,14 @@ const NewChannelButton = () => {
                   headers: {
                     Authorization: `Bearer ${auth.token}`,
                   },
-                }
+                },
               );
               console.log(response);
               const [newChannel] = [...channels.list].reverse();
               console.log(
                 'Новый канал в сабмите модального окна',
                 channels,
-                newChannel
+                newChannel,
               );
               dispatch(setCurrentChannel(response.data));
               handleClose();
@@ -588,7 +585,7 @@ const MainPage = () => {
   const { channels, messages } = useSelector((state) => {
     console.log(
       'Состояние из стора',
-      JSON.stringify(state.channels.currentChannel)
+      JSON.stringify(state.channels.currentChannel),
     );
     return state;
   });
@@ -599,7 +596,7 @@ const MainPage = () => {
     : 'Канал не выбран';
 
   const channelMessages = messages.list.filter(
-    (message) => message.channelId === channels.currentChannel.id
+    (message) => message.channelId === channels.currentChannel.id,
   );
 
   return (
@@ -622,7 +619,7 @@ const MainPage = () => {
               <span className="text-muted">
                 {t('mainPage.messages', {
                   count: channelMessages.filter(
-                    (message) => message.channelId === currentChannel.id
+                    (message) => message.channelId === currentChannel.id,
                   ).length,
                 })}
               </span>
