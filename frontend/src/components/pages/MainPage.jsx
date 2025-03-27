@@ -255,7 +255,7 @@ const Channels = ({ channels }) => {
           }}
         >
           {({
-            isSubmitting, errors, touched, handleSubmit
+            isSubmitting, errors, touched, handleSubmit,
           }) => (
             <Form onSubmit={handleSubmit}>
               <Modal.Header closeButton>
@@ -501,7 +501,7 @@ const NewChannelButton = () => {
           }}
         >
           {({
-            isSubmitting, errors, touched, handleSubmit
+            isSubmitting, errors, touched, handleSubmit,
           }) => (
             <Form onSubmit={handleSubmit}>
               <Modal.Header closeButton>

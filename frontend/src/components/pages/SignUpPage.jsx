@@ -149,7 +149,7 @@ const SignUpPage = () => {
                 validationSchema={SignupSchema}
               >
                 {({
-                  isSubmitting, submitForm, values, setFieldTouched
+                  isSubmitting, submitForm, values, setFieldTouched,
                 }) => (
                   <Form as={FormikForm} className="w-50">
                     <h1 className="text-center mb-4">
@@ -180,11 +180,11 @@ const SignUpPage = () => {
                                 isInvalid={meta.touched && !!meta.error}
                                 ref={fieldRefs[fieldName]}
                                 onKeyDown={(e) => handleKeyDown(
-                                    e,
-                                    submitForm,
-                                    values,
-                                    setFieldTouched,
-                                  )}
+                                  e,
+                                  submitForm,
+                                  values,
+                                  setFieldTouched,
+                                )}
                               />
                               <Form.Control.Feedback type="invalid" tooltip>
                                 {meta.touched && meta.error}
