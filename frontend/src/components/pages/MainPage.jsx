@@ -402,7 +402,7 @@ const MessageForm = () => {
           className="border-0 p-0 ps-2 form-control"
           onChange={(e) => setInputValue(e.target.value)}
         />
-        <button className="btn btn-group-vertical" type="button">
+        <button className="btn btn-group-vertical" type="submit">
           <svg
             type="submit"
             disabled
