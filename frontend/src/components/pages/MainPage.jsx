@@ -137,63 +137,62 @@ const Channels = ({ channels }) => {
         as="ul"
       >
         {channels.map((channel) => (
-            <Nav.Item className="w-100" as="li" key={channel.id}>
-              {channel.removable ? (
-                <Dropdown as={ButtonGroup} className="d-flex">
-                  <Button
-                    type="button"
-                    variant={
-                      channel.id === currentChannel.id ? 'secondary' : 'light'
-                    }
-                    className="w-100 rounded-0 text-start text-truncate"
-                    onClick={() => handleClick(channel)}
-                    aria-label={channel.name}
-                  >
-                    <span className="me-1"># </span>
-                    {channel.name}
-                  </Button>
-
-                  <Dropdown.Toggle
-                    split
-                    id="dropdown-split-basic"
-                    variant={
-                      channel.id === currentChannel.id ? 'secondary' : 'light'
-                    }
-                  >
-                    <span className="visually-hidden">Управление каналом</span>
-                  </Dropdown.Toggle>
-
-                  <Dropdown.Menu>
-                    <Dropdown.Item
-                      as="button"
-                      onClick={() => handleShowRemoveModal(channel)}
-                    >
-                      {t('mainPage.delete')}
-                    </Dropdown.Item>
-                    <Dropdown.Item
-                      as="button"
-                      onClick={() => handleShowRenameModal(channel)}
-                    >
-                      {t('mainPage.rename')}
-                    </Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
-              ) : (
+          <Nav.Item className="w-100" as="li" key={channel.id}>
+            {channel.removable ? (
+              <Dropdown as={ButtonGroup} className="d-flex">
                 <Button
-                  onClick={() => handleClick(channel)}
                   type="button"
                   variant={
                     channel.id === currentChannel.id ? 'secondary' : 'light'
                   }
-                  className="w-100 rounded-0 text-start"
+                  className="w-100 rounded-0 text-start text-truncate"
+                  onClick={() => handleClick(channel)}
+                  aria-label={channel.name}
                 >
                   <span className="me-1"># </span>
                   {channel.name}
                 </Button>
-              )}
-            </Nav.Item>
-          )
-        )}
+
+                <Dropdown.Toggle
+                  split
+                  id="dropdown-split-basic"
+                  variant={
+                    channel.id === currentChannel.id ? 'secondary' : 'light'
+                  }
+                >
+                  <span className="visually-hidden">Управление каналом</span>
+                </Dropdown.Toggle>
+
+                <Dropdown.Menu>
+                  <Dropdown.Item
+                    as="button"
+                    onClick={() => handleShowRemoveModal(channel)}
+                  >
+                    {t('mainPage.delete')}
+                  </Dropdown.Item>
+                  <Dropdown.Item
+                    as="button"
+                    onClick={() => handleShowRenameModal(channel)}
+                  >
+                    {t('mainPage.rename')}
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            ) : (
+              <Button
+                onClick={() => handleClick(channel)}
+                type="button"
+                variant={
+                  channel.id === currentChannel.id ? 'secondary' : 'light'
+                }
+                className="w-100 rounded-0 text-start"
+              >
+                <span className="me-1"># </span>
+                {channel.name}
+              </Button>
+            )}
+          </Nav.Item>
+        ))}
       </Nav>
       <Modal
         show={showRemoveModal}
@@ -255,9 +254,7 @@ const Channels = ({ channels }) => {
             }
           }}
         >
-          {({
-            isSubmitting, errors, touched, handleSubmit
-          }) => (
+          {({ isSubmitting, errors, touched, handleSubmit }) => (
             <Form onSubmit={handleSubmit}>
               <Modal.Header closeButton>
                 <Modal.Title>{t('mainPage.renameChannel')}</Modal.Title>
@@ -305,9 +302,9 @@ const Channels = ({ channels }) => {
 Channels.propTypes = {
   channels: PropTypes.arrayOf(
     PropTypes.shape({
-      name: PropTypes.string.isRequired, 
+      name: PropTypes.string.isRequired,
     }),
-  ).isRequired, 
+  ).isRequired,
 };
 
 const Messages = ({ messages }) => {
@@ -323,12 +320,12 @@ const Messages = ({ messages }) => {
 
   return (
     <div id="messages-box" className="chat-messages overflow-auto px-5">
-      {messages.map((message, index) => (
-          <div className="text-break mb-2" key={message.id}>
-            <b>{message.username}</b>{`: ${message.body}`}
-          </div>
-        )
-      )}
+      {messages.map((message) => (
+        <div className="text-break mb-2" key={message.id}>
+          <b>{message.username}</b>
+          {`: ${message.body}`}
+        </div>
+      ))}
       <div ref={messagesEndRef} />
     </div>
   );
@@ -337,10 +334,10 @@ const Messages = ({ messages }) => {
 Messages.propTypes = {
   messages: PropTypes.arrayOf(
     PropTypes.shape({
-      name: PropTypes.string.isRequired, 
-      content: PropTypes.string.isRequired, 
+      name: PropTypes.string.isRequired,
+      content: PropTypes.string.isRequired,
     }),
-  ).isRequired, 
+  ).isRequired,
 };
 
 const MessageForm = () => {
@@ -501,9 +498,7 @@ const NewChannelButton = () => {
             }
           }}
         >
-          {({ 
-            isSubmitting, errors, touched, handleSubmit
-          }) => (
+          {({ isSubmitting, errors, touched, handleSubmit }) => (
             <Form onSubmit={handleSubmit}>
               <Modal.Header closeButton>
                 <Modal.Title>{t('mainPage.addChannel')}</Modal.Title>
