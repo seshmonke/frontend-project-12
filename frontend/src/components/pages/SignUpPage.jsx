@@ -148,7 +148,9 @@ const SignUpPage = () => {
                 }}
                 validationSchema={SignupSchema}
               >
-                {({ isSubmitting, submitForm, values, setFieldTouched }) => (
+                {({
+                  isSubmitting, submitForm, values, setFieldTouched
+                }) => (
                   <Form as={FormikForm} className="w-50">
                     <h1 className="text-center mb-4">
                       {t('signUpPage.title')}
@@ -167,7 +169,6 @@ const SignUpPage = () => {
                           {({ field, meta }) => (
                             <>
                               <Form.Control
-                                //{...field}
                                 name={field.name}
                                 id={field.id}
                                 value={field.value}
@@ -178,14 +179,12 @@ const SignUpPage = () => {
                                 placeholder={t(placeholders[fieldName])}
                                 isInvalid={meta.touched && !!meta.error}
                                 ref={fieldRefs[fieldName]}
-                                onKeyDown={(e) =>
-                                  handleKeyDown(
+                                onKeyDown={(e) => handleKeyDown(
                                     e,
                                     submitForm,
                                     values,
                                     setFieldTouched,
-                                  )
-                                }
+                                  )}
                               />
                               <Form.Control.Feedback type="invalid" tooltip>
                                 {meta.touched && meta.error}

@@ -254,7 +254,9 @@ const Channels = ({ channels }) => {
             }
           }}
         >
-          {({ isSubmitting, errors, touched, handleSubmit }) => (
+          {({
+            isSubmitting, errors, touched, handleSubmit
+          }) => (
             <Form onSubmit={handleSubmit}>
               <Modal.Header closeButton>
                 <Modal.Title>{t('mainPage.renameChannel')}</Modal.Title>
@@ -498,7 +500,9 @@ const NewChannelButton = () => {
             }
           }}
         >
-          {({ isSubmitting, errors, touched, handleSubmit }) => (
+          {({
+            isSubmitting, errors, touched, handleSubmit
+          }) => (
             <Form onSubmit={handleSubmit}>
               <Modal.Header closeButton>
                 <Modal.Title>{t('mainPage.addChannel')}</Modal.Title>
