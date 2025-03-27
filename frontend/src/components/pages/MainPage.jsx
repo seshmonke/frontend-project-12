@@ -149,7 +149,8 @@ const Channels = ({ channels }) => {
                     onClick={() => handleClick(channel)}
                     aria-label={channel.name}
                   >
-                    {`${<span className="me-1">#</span>} ${channel.name}`}
+                    <span className="me-1"># </span>
+                    {channel.name}
                   </Button>
 
                   <Dropdown.Toggle
@@ -186,7 +187,8 @@ const Channels = ({ channels }) => {
                   }
                   className="w-100 rounded-0 text-start"
                 >
-                  {`${<span className="me-1">#</span>} ${channel.name}`}
+                  <span className="me-1"># </span>
+                  {channel.name}
                 </Button>
               )}
             </Nav.Item>
@@ -589,7 +591,7 @@ const MainPage = () => {
     return state;
   });
 
-  const currentChannel = useSelector(({ channelsList }) => channelsList.currentChannel);
+  const currentChannel = useSelector((state) => state.channels.currentChannel);
   const currentChannelName = currentChannel
     ? currentChannel.name
     : 'Канал не выбран';
