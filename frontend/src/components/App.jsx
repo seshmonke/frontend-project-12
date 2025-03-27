@@ -1,4 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
+import { ToastContainer } from 'react-toastify';
+import { Provider, ErrorBoundary } from '@rollbar/react';
 import PropTypes from 'prop-types';
 import {
   BrowserRouter,
@@ -12,9 +16,8 @@ import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 import { AuthContext } from '../contexts/index.jsx';
 import { useAuth } from '../hooks/index.jsx';
-import { useSelector, useDispatch } from 'react-redux';
 import { NotFoundPage } from './pages/NotFoundPage.jsx';
-import { LoginPage } from './pages/LoginPage.jsx';
+import LoginPage from './pages/LoginPage.jsx';
 import { MainPage } from './pages/MainPage.jsx';
 import { SignUpPage } from './pages/SignUpPage.jsx';
 import socket from '../services/socket.js';
@@ -25,9 +28,6 @@ import {
   removeChannel,
   renameChannel,
 } from '../slices/channelsSlice.js';
-import { useTranslation } from 'react-i18next';
-import { ToastContainer } from 'react-toastify';
-import { Provider, ErrorBoundary } from '@rollbar/react';
 
 const rollbarConfig = {
   accessToken: '25319b5d0cef45c5842b232581503f9d',
@@ -53,10 +53,10 @@ const AuthProvider = ({ children }) => {
     dispatch(clearCredentials());
   };
 
+  const contextValue = useMemo(() => ({ loggedIn, logIn, logOut }), [loggedIn]);
+
   return (
-    <AuthContext.Provider value={{ loggedIn, logIn, logOut }}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 
@@ -67,13 +67,6 @@ AuthProvider.propTypes = {
 const PrivateRoute = ({ children }) => {
   const auth = useAuth();
   const location = useLocation();
-  console.log(
-    'Приватный путь работает!',
-    'auth: ',
-    auth,
-    'location: ',
-    location
-  );
 
   return auth.loggedIn ? (
     children
@@ -177,19 +170,19 @@ const App = () => {
               <Routes>
                 <Route
                   path="/"
-                  element={
+                  element={(
                     <PrivateRoute>
                       <MainPage />
                     </PrivateRoute>
-                  }
+                  )}
                 />
                 <Route
                   path="/login"
-                  element={
+                  element={(
                     <PublicRoute>
                       <LoginPage />
                     </PublicRoute>
-                  }
+                  )}
                 />
                 <Route path="/signup" element={<SignUpPage />} />
                 <Route path="*" element={<NotFoundPage />} />

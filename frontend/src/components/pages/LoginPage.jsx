@@ -1,5 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Formik, Field, Form } from 'formik';
 import loginImage from '../../assets/loginImage.png';
@@ -11,12 +15,8 @@ import {
   Card,
   Form as BootstrapForm,
 } from 'react-bootstrap';
-import axios from 'axios';
-import { useDispatch } from 'react-redux';
 import { setCredentials } from '../../slices/authSlice.js';
 import { useAuth } from '../../hooks/index.jsx';
-import { useTranslation } from 'react-i18next';
-import { toast } from 'react-toastify';
 import routes from '../../routes.js';
 
 const LoginForm = () => {
@@ -55,11 +55,9 @@ const LoginForm = () => {
       console.log('response', response, 'isSubmitting', isSubmitting);
     } catch (e) {
       console.log('error', e);
-      //toast(e.message);
 
-      e.response
-        ? setAuthError(t('notification.wrongCredentials'))
-        : setAuthError(t('notification.error'));
+
+      setAuthError(t(e.response ? 'notification.wrongCredentials' : 'notification.error'));
     }
   };
 
@@ -134,8 +132,4 @@ const LoginPage = () => {
   );
 };
 
-LoginPage.propTypes = {
-  location: PropTypes.object,
-};
-
-export { LoginPage };
+export default LoginPage;
