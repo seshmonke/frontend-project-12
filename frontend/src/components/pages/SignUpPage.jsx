@@ -44,7 +44,7 @@ const SignUpPage = () => {
 
   const handleSubmit = async (
     { username, password },
-    { resetForm, isSubmitting }
+    { resetForm, isSubmitting },
   ) => {
     try {
       const response = await axios.post(routes.signupPath(), {
@@ -95,7 +95,7 @@ const SignUpPage = () => {
 
       // Находим первое незаполненное поле
       const emptyField = fieldOrder.find(
-        (field) => values[field].trim() === ''
+        (field) => values[field].trim() === '',
       );
 
       if (emptyField) {
@@ -175,14 +175,12 @@ const SignUpPage = () => {
                                   }
                                   isInvalid={meta.touched && !!meta.error}
                                   ref={fieldRefs[fieldName]}
-                                  onKeyDown={(e) =>
-                                    handleKeyDown(
+                                  onKeyDown={(e) => handleKeyDown(
                                       e,
                                       submitForm,
                                       values,
-                                      setFieldTouched
-                                    )
-                                  }
+                                      setFieldTouched,
+                                    )}
                                 />
                                 <Form.Control.Feedback type="invalid" tooltip>
                                   {meta.touched && meta.error}
@@ -213,4 +211,4 @@ const SignUpPage = () => {
   );
 };
 
-export { SignUpPage };
+export default SignUpPage;

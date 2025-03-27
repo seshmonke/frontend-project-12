@@ -136,8 +136,7 @@ const Channels = ({ channels }) => {
         className="flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block"
         as="ul"
       >
-        {channels.map((channel) => {
-          return (
+        {channels.map((channel) => (
             <Nav.Item className="w-100" as="li" key={channel.id}>
               {channel.removable ? (
                 <Dropdown as={ButtonGroup} className="d-flex">
@@ -150,7 +149,7 @@ const Channels = ({ channels }) => {
                     onClick={() => handleClick(channel)}
                     aria-label={channel.name}
                   >
-                    <span className="me-1">#</span> {channel.name}
+                    {`${<span className="me-1">#</span>} ${channel.name}`}
                   </Button>
 
                   <Dropdown.Toggle
@@ -172,9 +171,7 @@ const Channels = ({ channels }) => {
                     </Dropdown.Item>
                     <Dropdown.Item
                       as="button"
-                      onClick={() => {
-                        return handleShowRenameModal(channel);
-                      }}
+                      onClick={() => handleShowRenameModal(channel)}
                     >
                       {t('mainPage.rename')}
                     </Dropdown.Item>
@@ -189,12 +186,12 @@ const Channels = ({ channels }) => {
                   }
                   className="w-100 rounded-0 text-start"
                 >
-                  <span className="me-1">#</span> {channel.name}
+                  {`${<span className="me-1">#</span>} ${channel.name}`}
                 </Button>
               )}
             </Nav.Item>
-          );
-        })}
+          )
+        )}
       </Nav>
       <Modal
         show={showRemoveModal}
@@ -256,7 +253,9 @@ const Channels = ({ channels }) => {
             }
           }}
         >
-          {({ isSubmitting, errors, touched, handleSubmit }) => (
+          {({
+            isSubmitting, errors, touched, handleSubmit
+          }) => (
             <Form onSubmit={handleSubmit}>
               <Modal.Header closeButton>
                 <Modal.Title>{t('mainPage.renameChannel')}</Modal.Title>
@@ -304,9 +303,9 @@ const Channels = ({ channels }) => {
 Channels.propTypes = {
   channels: PropTypes.arrayOf(
     PropTypes.shape({
-      name: PropTypes.string.isRequired, // Указываем, что name должен быть строкой и является обязательным
+      name: PropTypes.string.isRequired, 
     }),
-  ).isRequired, // Указываем, что channels является обязательным массивом
+  ).isRequired, 
 };
 
 const Messages = ({ messages }) => {
@@ -322,13 +321,12 @@ const Messages = ({ messages }) => {
 
   return (
     <div id="messages-box" className="chat-messages overflow-auto px-5">
-      {messages.map((message, index) => {
-        return (
-          <div className="text-break mb-2" key={index}>
-            <b>{message.username}</b>: {message.body}
+      {messages.map((message, index) => (
+          <div className="text-break mb-2" key={message.id}>
+            <b>{message.username}</b>{`: ${message.body}`}
           </div>
-        );
-      })}
+        )
+      )}
       <div ref={messagesEndRef} />
     </div>
   );
@@ -337,19 +335,17 @@ const Messages = ({ messages }) => {
 Messages.propTypes = {
   messages: PropTypes.arrayOf(
     PropTypes.shape({
-      name: PropTypes.string.isRequired, // Указываем, что name должен быть строкой и является обязательным
-      content: PropTypes.string.isRequired, // Указываем, что content должен быть строкой и является обязательным
+      name: PropTypes.string.isRequired, 
+      content: PropTypes.string.isRequired, 
     }),
-  ).isRequired, // Указываем, что messages является обязательным массивом
+  ).isRequired, 
 };
 
 const MessageForm = () => {
   const { t } = useTranslation();
   const inputRef = useRef(null);
   const [inputValue, setInputValue] = useState('');
-  const { channels, auth, messages } = useSelector((state) => {
-    return state;
-  });
+  const { channels, auth, messages } = useSelector((state) => state);
   const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
@@ -405,7 +401,7 @@ const MessageForm = () => {
           className="border-0 p-0 ps-2 form-control"
           onChange={(e) => setInputValue(e.target.value)}
         />
-        <button className="btn btn-group-vertical">
+        <button className="btn btn-group-vertical" type="button">
           <svg
             type="submit"
             disabled
@@ -418,7 +414,7 @@ const MessageForm = () => {
             <path
               fillRule="evenodd"
               d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm4.5 5.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"
-            ></path>
+            />
           </svg>
           <span className="visually-hidden">Отправить</span>
         </button>
@@ -460,6 +456,7 @@ const NewChannelButton = () => {
   return (
     <>
       <button
+        type="button"
         className="p-0 text-primary btn btn-group-vertical"
         onClick={handleShow}
       >
@@ -502,7 +499,9 @@ const NewChannelButton = () => {
             }
           }}
         >
-          {({ isSubmitting, errors, touched, handleSubmit }) => (
+          {({ 
+            isSubmitting, errors, touched, handleSubmit
+          }) => (
             <Form onSubmit={handleSubmit}>
               <Modal.Header closeButton>
                 <Modal.Title>{t('mainPage.addChannel')}</Modal.Title>
@@ -590,7 +589,7 @@ const MainPage = () => {
     return state;
   });
 
-  const currentChannel = useSelector(({ channels }) => channels.currentChannel);
+  const currentChannel = useSelector(({ channelsList }) => channelsList.currentChannel);
   const currentChannelName = currentChannel
     ? currentChannel.name
     : 'Канал не выбран';
@@ -614,7 +613,7 @@ const MainPage = () => {
           <div className="d-flex flex-column h-100">
             <div className="bg-light mb-4 p-3 shadow-sm small">
               <p className="m-0">
-                <b># {currentChannelName}</b>
+                <b>{`# ${currentChannelName}`}</b>
               </p>
               <span className="text-muted">
                 {t('mainPage.messages', {
@@ -637,4 +636,4 @@ const MainPage = () => {
   );
 };
 
-export { MainPage };
+export default MainPage;
