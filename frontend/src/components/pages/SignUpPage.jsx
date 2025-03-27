@@ -110,6 +110,18 @@ const SignUpPage = () => {
     }
   };
 
+  const placeholders = {
+    username: 'validation.usernameMinMax',
+    password: 'validation.passwordMin',
+    confirmPassword: 'validation.passwordMatch',
+  };
+
+  const labels = {
+    username: 'signUpPage.username',
+    password: 'signUpPage.password',
+    confirmPassword: 'signUpPage.confirmPassword',
+  };
+
   return (
     <Container fluid className="h-100">
       <Row className="justify-content-center align-content-center h-100">
@@ -145,50 +157,38 @@ const SignUpPage = () => {
                         <FloatingLabel
                           key={fieldName}
                           controlId={fieldName}
-                          label={
-                            fieldName === 'username'
-                              ? t('signUpPage.username')
-                              : fieldName === 'password'
-                              ? t('signUpPage.password')
-                              : t('signUpPage.confirmPassword')
-                          }
+                          label={t(labels[fieldName])}
                           className="mb-3"
                         >
                           <Field name={fieldName}>
-                            {({ field, meta }) => (
-                              <>
-                                <Form.Control
-                                  {...field}
-                                  type={
-                                    fieldName.includes('password')
-                                      ? 'password'
-                                      : fieldName.includes('confirmPassword')
-                                      ? 'password'
-                                      : 'text'
-                                  }
-                                  placeholder={
-                                    fieldName === 'username'
-                                      ? t('validation.usernameMinMax')
-                                      : fieldName === 'password'
-                                      ? t('validation.passwordMin')
-                                      : t('validation.passwordMatch')
-                                  }
-                                  isInvalid={meta.touched && !!meta.error}
-                                  ref={fieldRefs[fieldName]}
-                                  onKeyDown={(e) =>
-                                    handleKeyDown(
-                                      e,
-                                      submitForm,
-                                      values,
-                                      setFieldTouched,
-                                    )
-                                  }
-                                />
-                                <Form.Control.Feedback type="invalid" tooltip>
-                                  {meta.touched && meta.error}
-                                </Form.Control.Feedback>
-                              </>
-                            )}
+                            {({ field, meta }) => {
+                              return (
+                                <>
+                                  <Form.Control
+                                    {...field}
+                                    type={
+                                      fieldName === 'username'
+                                        ? 'text'
+                                        : 'password'
+                                    }
+                                    placeholder={t(placeholders[fieldName])}
+                                    isInvalid={meta.touched && !!meta.error}
+                                    ref={fieldRefs[fieldName]}
+                                    onKeyDown={(e) =>
+                                      handleKeyDown(
+                                        e,
+                                        submitForm,
+                                        values,
+                                        setFieldTouched,
+                                      )
+                                    }
+                                  />
+                                  <Form.Control.Feedback type="invalid" tooltip>
+                                    {meta.touched && meta.error}
+                                  </Form.Control.Feedback>
+                                </>
+                              );
+                            }}
                           </Field>
                         </FloatingLabel>
                       );

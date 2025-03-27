@@ -11,9 +11,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@eslint/create-config": "^1.0.0",
     "@hexlet/chat-server": "^2.0.4",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
+    "eslint": "^8.57.0",
     "formik": "^2.4.6",
     "prop-types": "^15.8.1",
     "react-bootstrap": "^2.10.8",
