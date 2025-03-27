@@ -62,7 +62,13 @@ const SignUpPage = () => {
       console.log('response', response, 'isSubmitting', isSubmitting);
     } catch (error) {
       console.log('error', error);
-      setSignUpError(t(error.response?.status ? 'notification.alreadyExist' : 'notification.error'));
+      setSignUpError(
+        t(
+          error.response?.status
+            ? 'notification.alreadyExist'
+            : 'notification.error',
+        ),
+      );
     }
   };
 
@@ -140,11 +146,8 @@ const SignUpPage = () => {
                   password: '',
                   confirmPassword: '',
                 }}
-                validationSchema={SignupSchema}
-              >
-                {({
-                    isSubmitting, submitForm, values, setFieldTouched
-                  }) => (
+                validationSchema={SignupSchema}>
+                {({ isSubmitting, submitForm, values, setFieldTouched }) => (
                   <Form as={FormikForm} className="w-50">
                     <h1 className="text-center mb-4">
                       {t('signUpPage.title')}
@@ -153,51 +156,47 @@ const SignUpPage = () => {
                       <div className="alert alert-danger">{signUpError}</div>
                     )}
                     {Object.keys(fieldRefs).map((fieldName) => (
-                        <FloatingLabel
-                          key={fieldName}
-                          controlId={fieldName}
-                          label={t(labels[fieldName])}
-                          className="mb-3"
-                        >
-                          <Field name={fieldName}>
-                            {({ field, meta }) => (
-                                <>
-                                  <Form.Control
-                                    //{...field}
-                                    name={field.name}
-                                    id={field.id}
-                                    value={field.value}
-                                    onChange={field.onChange}
-                                    type={
-                                      fieldName === 'username'
-                                        ? 'text'
-                                        : 'password'
-                                    }
-                                    placeholder={t(placeholders[fieldName])}
-                                    isInvalid={meta.touched && !!meta.error}
-                                    ref={fieldRefs[fieldName]}
-                                    onKeyDown={(e) => handleKeyDown(
-                                        e,
-                                        submitForm,
-                                        values,
-                                        setFieldTouched,
-                                      )}
-                                  />
-                                  <Form.Control.Feedback type="invalid" tooltip>
-                                    {meta.touched && meta.error}
-                                  </Form.Control.Feedback>
-                                </>
-                              )
-                            }
-                          </Field>
-                        </FloatingLabel>
-                      )
-                    )}
+                      <FloatingLabel
+                        key={fieldName}
+                        controlId={fieldName}
+                        label={t(labels[fieldName])}
+                        className="mb-3">
+                        <Field name={fieldName}>
+                          {({ field, meta }) => (
+                            <>
+                              <Form.Control
+                                //{...field}
+                                name={field.name}
+                                id={field.id}
+                                value={field.value}
+                                onChange={field.onChange}
+                                type={
+                                  fieldName === 'username' ? 'text' : 'password'
+                                }
+                                placeholder={t(placeholders[fieldName])}
+                                isInvalid={meta.touched && !!meta.error}
+                                ref={fieldRefs[fieldName]}
+                                onKeyDown={(e) =>
+                                  handleKeyDown(
+                                    e,
+                                    submitForm,
+                                    values,
+                                    setFieldTouched,
+                                  )
+                                }
+                              />
+                              <Form.Control.Feedback type="invalid" tooltip>
+                                {meta.touched && meta.error}
+                              </Form.Control.Feedback>
+                            </>
+                          )}
+                        </Field>
+                      </FloatingLabel>
+                    ))}
                     <Button
                       variant="outline-primary"
                       type="submit"
-                      className="w-100"
-                    >
+                      className="w-100">
                       {isSubmitting
                         ? t('signUpPage.sending')
                         : t('signUpPage.registration')}
