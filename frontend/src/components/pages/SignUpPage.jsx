@@ -146,7 +146,8 @@ const SignUpPage = () => {
                   password: '',
                   confirmPassword: '',
                 }}
-                validationSchema={SignupSchema}>
+                validationSchema={SignupSchema}
+              >
                 {({ isSubmitting, submitForm, values, setFieldTouched }) => (
                   <Form as={FormikForm} className="w-50">
                     <h1 className="text-center mb-4">
@@ -160,7 +161,8 @@ const SignUpPage = () => {
                         key={fieldName}
                         controlId={fieldName}
                         label={t(labels[fieldName])}
-                        className="mb-3">
+                        className="mb-3"
+                      >
                         <Field name={fieldName}>
                           {({ field, meta }) => (
                             <>
@@ -196,7 +198,8 @@ const SignUpPage = () => {
                     <Button
                       variant="outline-primary"
                       type="submit"
-                      className="w-100">
+                      className="w-100"
+                    >
                       {isSubmitting
                         ? t('signUpPage.sending')
                         : t('signUpPage.registration')}
