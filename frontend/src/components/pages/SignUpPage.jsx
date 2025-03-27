@@ -163,7 +163,11 @@ const SignUpPage = () => {
                             {({ field, meta }) => (
                                 <>
                                   <Form.Control
+                                    //{...field}
                                     name={field.name}
+                                    id={field.id}
+                                    value={field.value}
+                                    onChange={field.onChange}
                                     type={
                                       fieldName === 'username'
                                         ? 'text'
