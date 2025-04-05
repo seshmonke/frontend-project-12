@@ -15,7 +15,7 @@ import {
 } from 'react-bootstrap';
 import loginImage from '../../assets/loginImage.png';
 import { setCredentials } from '../../slices/authSlice.js';
-import useAuth from '../../hooks/index.jsx';
+import { useAuth } from '../../hooks/index.jsx';
 import routes from '../../routes.js';
 
 const LoginForm = () => {
@@ -41,17 +41,14 @@ const LoginForm = () => {
   const handleSubmit = async (values, { resetForm, isSubmitting }) => {
     try {
       setAuthError(null);
-      console.log(values);
       const response = await axios.post(routes.loginPath(), values);
       const { data } = response;
       resetForm();
-      window.localStorage.setItem('userId', JSON.stringify(data));
+      //window.localStorage.setItem('userId', JSON.stringify(data));
       dispatch(setCredentials(data));
 
-      logIn();
-      navigate('/');
-      console.log('getItem', window.localStorage.getItem('userId'));
-      console.log('response', response, 'isSubmitting', isSubmitting);
+      logIn(data);
+      navigate(routes.rootRoute());
     } catch (e) {
       setAuthError(t(e.response ? 'notification.wrongCredentials' : 'notification.error'));
     }

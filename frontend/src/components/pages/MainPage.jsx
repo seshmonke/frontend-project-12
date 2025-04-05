@@ -1,6 +1,5 @@
 import { Formik, Field, Form } from 'formik';
 import { useTranslation } from 'react-i18next';
-import filter from 'leo-profanity';
 import { toast } from 'react-toastify';
 import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
@@ -24,9 +23,7 @@ import {
 } from '../../slices/messagesSlice.js';
 import { setChannels, setCurrentChannel } from '../../slices/channelsSlice.js';
 import routes from '../../routes.js';
-
-filter.loadDictionary('ru');
-filter.loadDictionary('en');
+import { useFilter } from '../../hooks/index.jsx';
 
 const MyIcon = () => (
   <svg
@@ -53,7 +50,6 @@ const Channels = ({ channels }) => {
   const { token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const handleClick = (channel) => {
-    console.log('НАЖАТИЕ НА КНОПКУ КАНАЛА!');
     dispatch(setCurrentChannel(channel));
   };
 
@@ -98,7 +94,6 @@ const Channels = ({ channels }) => {
   };
 
   const handleKeyDown = (event) => {
-    console.log('Ивент из Handle key down', event);
     if (event.key === 'Enter') {
       handleRemoveChannel(); // Вызываем удаление канала при нажатии Enter
     }
@@ -234,7 +229,6 @@ const Channels = ({ channels }) => {
           validationSchema={RenameChannelSchema}
           onSubmit={async ({ channelName: name }) => {
             try {
-              console.log('Форма отправляется');
               const response = await axios.patch(
                 routes.channelsPath(
                   selectedChannel ? selectedChannel.id : null,
@@ -246,7 +240,6 @@ const Channels = ({ channels }) => {
                   },
                 },
               );
-              console.log('РЕСПОНС ИЗМЕНЕНИЯ ИМЕНИ КАНАЛА: ', response);
               handleCloseRenameModal();
               toast.success(t('notification.successRename'));
             } catch (error) {
@@ -343,6 +336,7 @@ Messages.propTypes = {
 };
 
 const MessageForm = () => {
+  const filterWords = useFilter();
   const { t } = useTranslation();
   const inputRef = useRef(null);
   const [inputValue, setInputValue] = useState('');
@@ -366,7 +360,7 @@ const MessageForm = () => {
     if (!inputValue.trim()) return;
     const newMessage = {
       id: messages.list.length,
-      body: filter.clean(inputValue),
+      body: filterWords(inputValue),
       channelId: channels.currentChannel.id,
       username: auth.username,
     };
@@ -435,8 +429,6 @@ const NewChannelButton = () => {
   const handleShow = () => setShow(true);
   const { auth, channels } = useSelector((state) => state);
 
-  console.log('список каналов: ', JSON.stringify(channels.list));
-
   const NewChannelSchema = Yup.object().shape({
     channelName: Yup.string()
       .min(3, t('validation.channelNameMinMax'))
@@ -474,7 +466,6 @@ const NewChannelButton = () => {
           onSubmit={async ({ channelName }) => {
             try {
               const name = filter.clean(channelName);
-              console.log('Форма отправляется');
               const response = await axios.post(
                 routes.channelsPath(),
                 { name },
@@ -484,18 +475,11 @@ const NewChannelButton = () => {
                   },
                 },
               );
-              console.log(response);
               const [newChannel] = [...channels.list].reverse();
-              console.log(
-                'Новый канал в сабмите модального окна',
-                channels,
-                newChannel,
-              );
               dispatch(setCurrentChannel(response.data));
               handleClose();
               toast.success(t('notification.successCreate'));
             } catch (error) {
-              console.log(error);
               toast.error(error.message);
             }
           }}
@@ -583,10 +567,6 @@ const MainPage = () => {
   }, [auth.token, dispatch]);
 
   const { channels, messages } = useSelector((state) => {
-    console.log(
-      'Состояние из стора',
-      JSON.stringify(state.channels.currentChannel),
-    );
     return state;
   });
 

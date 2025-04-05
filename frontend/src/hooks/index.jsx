@@ -1,7 +1,8 @@
 import { useContext } from 'react';
 
-import { AuthContext } from '../contexts/index.jsx';
+import { AuthContext, FilterContext } from '../contexts/index.jsx';
 
 const useAuth = () => useContext(AuthContext);
+const useFilter = () => useContext(FilterContext);
 
-export default useAuth;
+export { useAuth, useFilter };

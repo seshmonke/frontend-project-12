@@ -17,7 +17,7 @@ import {
 } from 'react-bootstrap';
 import signUpImage from '../../assets/signUpImage.png';
 import { setCredentials } from '../../slices/authSlice';
-import useAuth from '../../hooks';
+import { useAuth } from '../../hooks';
 import routes from '../../routes.js';
 
 const SignUpPage = () => {
@@ -51,17 +51,13 @@ const SignUpPage = () => {
         username,
         password,
       });
-      console.log('Создание нового пользователя респонс: ', response);
       resetForm();
       window.localStorage.setItem('userId', JSON.stringify(response.data));
       dispatch(setCredentials(response.data));
       setSignUpError(null);
       logIn();
       navigate('/');
-      console.log('getItem', window.localStorage.getItem('userId'));
-      console.log('response', response, 'isSubmitting', isSubmitting);
     } catch (error) {
-      console.log('error', error);
       setSignUpError(
         t(
           error.response?.status
@@ -95,7 +91,6 @@ const SignUpPage = () => {
 
       // Определяем порядок полей
       const fieldOrder = Object.keys(fieldRefs);
-      console.log('fieldOrder', fieldOrder);
 
       // Находим первое незаполненное поле
       const emptyField = fieldOrder.find(

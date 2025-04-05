@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { ToastContainer } from 'react-toastify';
 import { Provider, ErrorBoundary } from '@rollbar/react';
-import PropTypes from 'prop-types';
+import filter from 'leo-profanity';
 import {
   BrowserRouter,
   Routes,
@@ -14,13 +14,13 @@ import {
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
-import { AuthContext } from '../contexts/index.jsx';
-import useAuth from '../hooks/index.jsx';
+import { io } from 'socket.io-client';
+import { AuthContext, FilterContext } from '../contexts/index.jsx';
+import { useAuth } from '../hooks/index.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import MainPage from './pages/MainPage.jsx';
 import SignUpPage from './pages/SignUpPage.jsx';
-import socket from '../services/socket.js';
 import { clearCredentials } from '../slices/authSlice.js';
 import { addNewMessage } from '../slices/messagesSlice.js';
 import {
@@ -28,10 +28,24 @@ import {
   removeChannel,
   renameChannel,
 } from '../slices/channelsSlice.js';
+import routes from '../routes.js';
 
 const rollbarConfig = {
-  accessToken: '25319b5d0cef45c5842b232581503f9d',
+  accessToken: process.env.ROLLBAR_ACCESS_TOKEN,
   environment: 'testenv',
+};
+
+const FilterProvider = ({ children }) => {
+  const filterWords = (word) => {
+    filter.loadDictionary('en');
+    const englishWord = filter.clean(word);
+    filter.loadDictionary('ru');
+    return filter.clean(englishWord);
+  };
+
+  return (
+    <FilterContext.Provider value={filterWords}>{children}</FilterContext.Provider>
+  );
 };
 
 const AuthProvider = ({ children }) => {
@@ -39,14 +53,16 @@ const AuthProvider = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState(() => {
     try {
       const credentials = JSON.parse(window.localStorage.getItem('userId'));
-      console.log('Какой токен отпарсился: ', credentials, !!credentials);
       return !!credentials;
     } catch (error) {
       console.error(error);
       return false;
     }
   });
-  const logIn = () => setLoggedIn(true);
+  const logIn = (data) => {
+    window.localStorage.setItem('userId', JSON.stringify(data));
+    setLoggedIn(true);
+  };
   const logOut = () => {
     localStorage.removeItem('userId');
     setLoggedIn(false);
@@ -60,10 +76,6 @@ const AuthProvider = ({ children }) => {
   );
 };
 
-AuthProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-};
-
 const PrivateRoute = ({ children }) => {
   const auth = useAuth();
   const location = useLocation();
@@ -71,28 +83,19 @@ const PrivateRoute = ({ children }) => {
   return auth.loggedIn ? (
     children
   ) : (
-    <Navigate to="/login" state={{ from: location }} />
+    <Navigate to={routes.loginRoute()} state={{ from: location }} />
   );
-};
-
-PrivateRoute.propTypes = {
-  children: PropTypes.node.isRequired,
 };
 
 const PublicRoute = ({ children }) => {
   const auth = useAuth();
-  console.log('auth Public Route', auth);
   const location = useLocation();
 
   return auth.loggedIn ? (
-    <Navigate to="/" state={{ from: location }} />
+    <Navigate to={routes.rootRoute()} state={{ from: location }} />
   ) : (
     children
   );
-};
-
-PublicRoute.propTypes = {
-  children: PropTypes.node.isRequired,
 };
 
 const LogOutButton = () => {
@@ -107,23 +110,16 @@ const LogOutButton = () => {
 };
 
 const App = () => {
+  
+  const socket = io(routes.socketPath());
   const { t } = useTranslation();
   const { loggedIn } = useAuth();
   const dispatch = useDispatch();
   useSelector((state) => {
-    console.log('Состояние из стора', state);
     return state;
   });
+
   useEffect(() => {
-    console.log('logged in: ', loggedIn);
-    const onConnect = () => {
-      console.log('Сокет подключился ура');
-    };
-
-    const onDisconnect = () => {
-      console.log('Сокет отключился ура');
-    };
-
     const onNewMessage = (payload) => {
       dispatch(addNewMessage(payload));
     };
@@ -140,56 +136,59 @@ const App = () => {
       dispatch(renameChannel(payload));
     };
 
-    socket.on('connect', onConnect);
-    socket.on('disconnect', onDisconnect);
     socket.on('newMessage', onNewMessage);
     socket.on('newChannel', onNewChannel);
     socket.on('removeChannel', onRemoveChannel);
     socket.on('renameChannel', onRenameChannel);
 
     return () => {
-      socket.off('connect', onConnect);
-      socket.off('disconnect', onDisconnect);
+      socket.off('connect');
+      socket.off('disconnect');
     };
   }, []);
 
   return (
     <Provider config={rollbarConfig}>
       <ErrorBoundary>
-        <AuthProvider>
-          <ToastContainer />
-          <div className="d-flex flex-column bg-white h-100">
-            <Navbar className="bg-light-subtle shadow-sm">
-              <Container>
-                <Navbar.Brand href="/">{t('title')}</Navbar.Brand>
-                <LogOutButton />
-              </Container>
-            </Navbar>
+        <FilterProvider>
+          <AuthProvider>
+            <ToastContainer />
+            <div className="d-flex flex-column bg-white h-100">
+              <Navbar className="bg-light-subtle shadow-sm">
+                <Container>
+                  <Navbar.Brand href="/">{t('title')}</Navbar.Brand>
+                  <LogOutButton />
+                </Container>
+              </Navbar>
 
-            <BrowserRouter>
-              <Routes>
-                <Route
-                  path="/"
-                  element={(
-                    <PrivateRoute>
-                      <MainPage />
-                    </PrivateRoute>
-                  )}
-                />
-                <Route
-                  path="/login"
-                  element={(
-                    <PublicRoute>
-                      <LoginPage />
-                    </PublicRoute>
-                  )}
-                />
-                <Route path="/signup" element={<SignUpPage />} />
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-            </BrowserRouter>
-          </div>
-        </AuthProvider>
+              <BrowserRouter>
+                <Routes>
+                  <Route
+                    path={routes.rootRoute()}
+                    element={
+                      <PrivateRoute>
+                        <MainPage />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path={routes.loginRoute()}
+                    element={
+                      <PublicRoute>
+                        <LoginPage />
+                      </PublicRoute>
+                    }
+                  />
+                  <Route path={routes.signupRoute()} element={<SignUpPage />} />
+                  <Route
+                    path={routes.othersRoute()}
+                    element={<NotFoundPage />}
+                  />
+                </Routes>
+              </BrowserRouter>
+            </div>
+          </AuthProvider>
+        </FilterProvider>
       </ErrorBoundary>
     </Provider>
   );
