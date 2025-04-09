@@ -55,7 +55,7 @@ const SignUpPage = () => {
       window.localStorage.setItem('userId', JSON.stringify(response.data));
       dispatch(setCredentials(response.data));
       setSignUpError(null);
-      logIn();
+      logIn(response.data);
       navigate('/');
     } catch (error) {
       setSignUpError(

@@ -5,7 +5,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import * as Yup from 'yup';
 import { useSelector, useDispatch } from 'react-redux';
-import PropTypes from 'prop-types';
 import {
   Container,
   Row,
@@ -26,11 +25,12 @@ import routes from '../../routes.js';
 import { useFilter } from '../../hooks/index.jsx';
 import addChannelButton from '../../assets/addChannelButton.svg';
 import sendMessageButton from '../../assets/sendMessageButton.svg';
+import { showModal } from '../../slices/modalSlice.js';
 
 const Channels = ({ channels }) => {
   const { t } = useTranslation();
-  const deleteButtonRef = useRef(null); // Реф для кнопки 'Удалить'
-  const renameInputRef = useRef(null); // Реф для кнопки 'Удалить'
+  const deleteButtonRef = useRef(null); 
+  const renameInputRef = useRef(null); 
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [showRenameModal, setShowRenameModal] = useState(false);
   const [selectedChannel, setSelectedChannel] = useState(null);
@@ -283,14 +283,6 @@ const Channels = ({ channels }) => {
   );
 };
 
-Channels.propTypes = {
-  channels: PropTypes.arrayOf(
-    PropTypes.shape({
-      name: PropTypes.string.isRequired,
-    }),
-  ).isRequired,
-};
-
 const Messages = ({ messages }) => {
   const messagesEndRef = useRef(null);
 
@@ -313,15 +305,6 @@ const Messages = ({ messages }) => {
       <div ref={messagesEndRef} />
     </div>
   );
-};
-
-Messages.propTypes = {
-  messages: PropTypes.arrayOf(
-    PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      content: PropTypes.string.isRequired,
-    }),
-  ).isRequired,
 };
 
 const MessageForm = () => {
@@ -428,7 +411,7 @@ const NewChannelButton = () => {
       <button
         type="button"
         className="p-0 text-primary btn btn-group-vertical"
-        onClick={handleShow}
+        onClick={() => dispatch(showModal('addingChannel'))}
       >
         <img src={addChannelButton} alt="addChannelButton" width="20" height="20" />
         <span className="visually-hidden">+</span>
