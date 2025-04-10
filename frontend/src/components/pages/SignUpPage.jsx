@@ -34,7 +34,7 @@ const SignUpPage = () => {
 
   useEffect(() => {
     fieldRefs.username.current?.focus();
-  }, []);
+  });
 
   useEffect(() => {
     if (signUpError) {
@@ -44,7 +44,7 @@ const SignUpPage = () => {
 
   const handleSubmit = async (
     { username, password },
-    { resetForm, isSubmitting },
+    { resetForm },
   ) => {
     try {
       const response = await axios.post(routes.signupPath(), {

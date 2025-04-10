@@ -6,8 +6,6 @@ import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import { Form as BootstrapForm, Button, Modal } from 'react-bootstrap';
-
-
 import routes from '../../routes';
 import { closeModal } from '../../slices/modalSlice';
 import { setCurrentChannel } from '../../slices/channelsSlice';
@@ -46,12 +44,10 @@ const AddChannelModal = () => {
         {
           headers: {
             Authorization: `Bearer ${auth.token}`,
-          },  
+          },
         },
       );
       dispatch(setCurrentChannel(response.data));
-      // handleClose();
-      console.log('ТУТ КОД ЕЩЁ НОРМ ВЫПОЛНЯЕТСЯ');
       dispatch(closeModal());
       toast.success(t('notification.successCreate'));
     } catch (error) {
@@ -68,7 +64,9 @@ const AddChannelModal = () => {
       validationSchema={NewChannelSchema}
       onSubmit={handleFormSubmit}
     >
-      {({ isSubmitting, errors, touched, handleSubmit }) => (
+      {({
+        isSubmitting, errors, touched, handleSubmit,
+      }) => (
         <Form onSubmit={handleSubmit}>
           <Modal.Header closeButton>
             <Modal.Title>{t('mainPage.addChannel')}</Modal.Title>

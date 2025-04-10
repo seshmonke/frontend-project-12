@@ -38,13 +38,12 @@ const LoginForm = () => {
     }
   }, [authError]);
 
-  const handleSubmit = async (values, { resetForm, isSubmitting }) => {
+  const handleSubmit = async (values, { resetForm }) => {
     try {
       setAuthError(null);
       const response = await axios.post(routes.loginPath(), values);
       const { data } = response;
       resetForm();
-      //window.localStorage.setItem('userId', JSON.stringify(data));
       dispatch(setCredentials(data));
 
       logIn(data);

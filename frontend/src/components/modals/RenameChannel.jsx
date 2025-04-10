@@ -1,21 +1,15 @@
 import React, { useEffect, useRef } from 'react';
-import { Modal } from 'react-bootstrap';
+import { Modal, Form as BootstrapForm, Button } from 'react-bootstrap';
 import { Formik, Field, Form } from 'formik';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
-import { Form as BootstrapForm, Button } from 'react-bootstrap';
-
 import routes from '../../routes';
 import { closeModal } from '../../slices/modalSlice';
-import { setCurrentChannel } from '../../slices/channelsSlice';
 import { useFilter } from '../../hooks/index.jsx';
-import {
-  setMessages,
-  removeChannelMessages,
-} from '../../slices/messagesSlice.js';
+
 
 const RenameChannelModal = () => {
   const dispatch = useDispatch();
@@ -78,7 +72,9 @@ const RenameChannelModal = () => {
       validationSchema={RenameChannelSchema}
       onSubmit={handleSubmitForm}
     >
-      {({ isSubmitting, errors, touched, handleSubmit }) => (
+      {({
+        isSubmitting, errors, touched, handleSubmit,
+      }) => (
         <Form onSubmit={handleSubmit}>
           <Modal.Header closeButton>
             <Modal.Title>{t('mainPage.renameChannel')}</Modal.Title>
