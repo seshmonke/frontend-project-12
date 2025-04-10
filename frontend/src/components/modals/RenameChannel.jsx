@@ -10,7 +10,6 @@ import routes from '../../routes';
 import { closeModal } from '../../slices/modalSlice';
 import { useFilter } from '../../hooks/index.jsx';
 
-
 const RenameChannelModal = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
