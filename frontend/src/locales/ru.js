@@ -14,6 +14,7 @@ export default {
       areYouSure: 'Уверены?', //
       cancel: 'Отменить', //
       controlChannel: 'Управление каналом',
+      send: 'Отправить',
       messages: '{{count}} сообщение', // Базовый ключ
       messages_plural: '{{count}} сообщения', // Множественная форма
       messages_few: '{{count}} сообщения', // Форма для нескольких
