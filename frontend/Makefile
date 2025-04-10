@@ -1,5 +1,5 @@
 build:
-	# npm ci
+	npm ci
 	vite build
 
 start:
