@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, {
+  useState, useEffect, useMemo, useCallback,
+} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { ToastContainer } from 'react-toastify';
@@ -11,15 +13,11 @@ import {
   useLocation,
   Navigate,
 } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import Container from 'react-bootstrap/Container';
-import Navbar from 'react-bootstrap/Navbar';
+import { Navbar, Modal } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { io } from 'socket.io-client';
-import {
-  AuthContext,
-  FilterContext,
-  ModalContext,
-} from '../contexts/index.jsx';
+import { AuthContext, FilterContext } from '../contexts/index.jsx';
 import { useAuth } from '../hooks/index.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
@@ -33,27 +31,21 @@ import {
   renameChannel,
 } from '../slices/channelsSlice.js';
 import routes from '../routes.js';
-import { Modal } from 'react-bootstrap';
 import getModal from './modals/index.js';
+import { closeModal } from '../slices/modalSlice.js';
 
 const rollbarConfig = {
   accessToken: process.env.ROLLBAR_ACCESS_TOKEN,
   environment: 'testenv',
 };
 
-const ModalProvider = ({ children }) => {
-  return (
-    <ModalContext.Provider value={Modal}>{children}</ModalContext.Provider>
-  );
-};
-
 const FilterProvider = ({ children }) => {
-  const filterWords = (word) => {
+  const filterWords = useCallback((word) => {
     filter.loadDictionary('en');
     const englishWord = filter.clean(word);
     filter.loadDictionary('ru');
     return filter.clean(englishWord);
-  };
+  }, []);
 
   return (
     <FilterContext.Provider value={filterWords}>
@@ -77,13 +69,16 @@ const AuthProvider = ({ children }) => {
     window.localStorage.setItem('userId', JSON.stringify(data));
     setLoggedIn(true);
   };
-  const logOut = () => {
+  const logOut = useCallback(() => {
     localStorage.removeItem('userId');
     setLoggedIn(false);
     dispatch(clearCredentials());
-  };
+  }, [dispatch]);
 
-  const contextValue = useMemo(() => ({ loggedIn, logIn, logOut }), [loggedIn]);
+  const contextValue = useMemo(
+    () => ({ loggedIn, logIn, logOut }),
+    [loggedIn, logOut],
+  );
 
   return (
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
@@ -129,9 +124,10 @@ const ModalFacade = () => {
   console.log('modal.type', modal.type);
   console.log('getModal(modal.type)', getModal(modal.type));
   const CurrentModal = getModal(modal.type);
+  const dispatch = useDispatch();
 
   return (
-    <Modal show={modal.active}>
+    <Modal show={modal.active} onHide={() => dispatch(closeModal())}>
       {CurrentModal ? <CurrentModal /> : null}
     </Modal>
   );
@@ -140,11 +136,7 @@ const ModalFacade = () => {
 const App = () => {
   const socket = io(routes.socketPath());
   const { t } = useTranslation();
-  const { loggedIn } = useAuth();
   const dispatch = useDispatch();
-  useSelector((state) => {
-    return state;
-  });
 
   useEffect(() => {
     const onNewMessage = (payload) => {
@@ -172,58 +164,53 @@ const App = () => {
       socket.off('connect');
       socket.off('disconnect');
     };
-  }, []);
+  });
 
   return (
     <Provider config={rollbarConfig}>
       <ErrorBoundary>
-        <ModalProvider>
-          <FilterProvider>
-            <AuthProvider>
+        <FilterProvider>
+          <AuthProvider>
             <ModalFacade />
-              <ToastContainer />
-              <div className="d-flex flex-column bg-white h-100">
-                <Navbar className="bg-light-subtle shadow-sm">
-                  <Container>
-                    <Navbar.Brand href={routes.rootRoute()}>
-                      {t('title')}
-                    </Navbar.Brand>
-                    <LogOutButton />
-                  </Container>
-                </Navbar>
+            <ToastContainer />
+            <div className="d-flex flex-column bg-white h-100">
+              <Navbar className="bg-light-subtle shadow-sm">
+                <Container>
+                  <Navbar.Brand href={routes.rootRoute()}>
+                    {t('title')}
+                  </Navbar.Brand>
+                  <LogOutButton />
+                </Container>
+              </Navbar>
 
-                <BrowserRouter>
-                  <Routes>
-                    <Route
-                      path={routes.rootRoute()}
-                      element={
-                        <PrivateRoute>
-                          <MainPage />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path={routes.loginRoute()}
-                      element={
-                        <PublicRoute>
-                          <LoginPage />
-                        </PublicRoute>
-                      }
-                    />
-                    <Route
-                      path={routes.signupRoute()}
-                      element={<SignUpPage />}
-                    />
-                    <Route
-                      path={routes.othersRoute()}
-                      element={<NotFoundPage />}
-                    />
-                  </Routes>
-                </BrowserRouter>
-              </div>
-            </AuthProvider>
-          </FilterProvider>
-        </ModalProvider>
+              <BrowserRouter>
+                <Routes>
+                  <Route
+                    path={routes.rootRoute()}
+                    element={(
+                      <PrivateRoute>
+                        <MainPage />
+                      </PrivateRoute>
+                    )}
+                  />
+                  <Route
+                    path={routes.loginRoute()}
+                    element={(
+                      <PublicRoute>
+                        <LoginPage />
+                      </PublicRoute>
+                    )}
+                  />
+                  <Route path={routes.signupRoute()} element={<SignUpPage />} />
+                  <Route
+                    path={routes.othersRoute()}
+                    element={<NotFoundPage />}
+                  />
+                </Routes>
+              </BrowserRouter>
+            </div>
+          </AuthProvider>
+        </FilterProvider>
       </ErrorBoundary>
     </Provider>
   );

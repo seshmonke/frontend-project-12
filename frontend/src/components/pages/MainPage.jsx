@@ -1,9 +1,7 @@
-import { Formik, Field, Form } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
-import * as Yup from 'yup';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   Container,
@@ -12,274 +10,99 @@ import {
   Nav,
   Button,
   Form as BootstrapForm,
-  Modal,
   Dropdown,
   ButtonGroup,
 } from 'react-bootstrap';
 import {
   setMessages,
-  removeChannelMessages,
 } from '../../slices/messagesSlice.js';
 import { setChannels, setCurrentChannel } from '../../slices/channelsSlice.js';
 import routes from '../../routes.js';
 import { useFilter } from '../../hooks/index.jsx';
 import addChannelButton from '../../assets/addChannelButton.svg';
 import sendMessageButton from '../../assets/sendMessageButton.svg';
-import { showModal } from '../../slices/modalSlice.js';
+import { selectChannelId, showModal } from '../../slices/modalSlice.js';
 
 const Channels = ({ channels }) => {
   const { t } = useTranslation();
-  const deleteButtonRef = useRef(null); 
-  const renameInputRef = useRef(null); 
-  const [showRemoveModal, setShowRemoveModal] = useState(false);
-  const [showRenameModal, setShowRenameModal] = useState(false);
-  const [selectedChannel, setSelectedChannel] = useState(null);
 
-  const { currentChannel, list } = useSelector((state) => state.channels);
-  const { token } = useSelector((state) => state.auth);
+  const { currentChannel } = useSelector((state) => state.channels);
   const dispatch = useDispatch();
   const handleClick = (channel) => {
     dispatch(setCurrentChannel(channel));
   };
 
-  const handleShowRemoveModal = (channel) => {
-    setSelectedChannel(channel);
-    setShowRemoveModal(true);
+  useSelector((state) => {
+    console.log('СОСТОЯНИЕ ЙЕ', state);
+  }, []);
+
+  const handleChannelDropdown = (channel, modalType) => {
+    dispatch(selectChannelId(channel.id));
+    dispatch(showModal(modalType));
   };
-
-  const handleCloseRemoveModal = () => {
-    setShowRemoveModal(false);
-    setSelectedChannel(null);
-  };
-
-  const handleShowRenameModal = (channel) => {
-    setSelectedChannel(channel);
-    setShowRenameModal(true);
-  };
-
-  const handleCloseRenameModal = () => {
-    setShowRenameModal(false);
-    setSelectedChannel(null);
-  };
-
-  const handleRemoveChannel = async () => {
-    if (!selectedChannel) return;
-
-    try {
-      await axios.delete(routes.channelsPath(selectedChannel.id), {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const [generalChannel] = list;
-      dispatch(removeChannelMessages(selectedChannel));
-      dispatch(setCurrentChannel(generalChannel));
-      toast.success(t('notification.successDelete'));
-    } catch (error) {
-      toast(error.message);
-    } finally {
-      setShowRemoveModal(false);
-    }
-  };
-
-  const handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
-      handleRemoveChannel(); // Вызываем удаление канала при нажатии Enter
-    }
-  };
-
-  useEffect(() => {
-    if (showRemoveModal && deleteButtonRef.current) {
-      deleteButtonRef.current.focus(); // Устанавливаем фокус на кнопку 'Удалить'
-    }
-  }, [showRemoveModal]);
-
-  useEffect(() => {
-    if (showRenameModal && renameInputRef.current) {
-      renameInputRef.current.focus();
-      renameInputRef.current.select();
-      // Устанавливаем фокус на поле ввода
-    }
-  }, [showRenameModal]);
-
-  const RenameChannelSchema = Yup.object().shape({
-    channelName: Yup.string()
-      .min(3, t('validation.channelNameMinMax'))
-      .max(20, t('validation.channelNameMinMax'))
-      .required(t('validation.required'))
-      .notOneOf(
-        list.map((channel) => channel.name),
-        t('validation.unique'),
-      ),
-  });
 
   return (
-    <>
-      <Nav
-        id="channels-box"
-        className="flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block"
-        as="ul"
-      >
-        {channels.map((channel) => (
-          <Nav.Item className="w-100" as="li" key={channel.id}>
-            {channel.removable ? (
-              <Dropdown as={ButtonGroup} className="d-flex">
-                <Button
-                  type="button"
-                  variant={
-                    channel.id === currentChannel.id ? 'secondary' : 'light'
-                  }
-                  className="w-100 rounded-0 text-start text-truncate"
-                  onClick={() => handleClick(channel)}
-                  aria-label={channel.name}
-                >
-                  <span className="me-1"># </span>
-                  {channel.name}
-                </Button>
-
-                <Dropdown.Toggle
-                  split
-                  id="dropdown-split-basic"
-                  variant={
-                    channel.id === currentChannel.id ? 'secondary' : 'light'
-                  }
-                >
-                  <span className="visually-hidden">Управление каналом</span>
-                </Dropdown.Toggle>
-
-                <Dropdown.Menu>
-                  <Dropdown.Item
-                    as="button"
-                    onClick={() => handleShowRemoveModal(channel)}
-                  >
-                    {t('mainPage.delete')}
-                  </Dropdown.Item>
-                  <Dropdown.Item
-                    as="button"
-                    onClick={() => handleShowRenameModal(channel)}
-                  >
-                    {t('mainPage.rename')}
-                  </Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            ) : (
+    <Nav
+      id="channels-box"
+      className="flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block"
+      as="ul"
+    >
+      {channels.map((channel) => (
+        <Nav.Item className="w-100" as="li" key={channel.id}>
+          {channel.removable ? (
+            <Dropdown as={ButtonGroup} className="d-flex">
               <Button
-                onClick={() => handleClick(channel)}
                 type="button"
                 variant={
                   channel.id === currentChannel.id ? 'secondary' : 'light'
                 }
-                className="w-100 rounded-0 text-start"
+                className="w-100 rounded-0 text-start text-truncate"
+                onClick={() => handleClick(channel)}
+                aria-label={channel.name}
               >
                 <span className="me-1"># </span>
                 {channel.name}
               </Button>
-            )}
-          </Nav.Item>
-        ))}
-      </Nav>
-      <Modal
-        show={showRemoveModal}
-        onHide={handleCloseRemoveModal}
-        centered
-        onKeyDown={handleKeyDown}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>{t('mainPage.deleteChannel')}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p className="lead">{t('mainPage.areYouSure')}</p>
-          <div className="d-flex justify-content-end">
+
+              <Dropdown.Toggle
+                split
+                id="dropdown-split-basic"
+                variant={
+                  channel.id === currentChannel.id ? 'secondary' : 'light'
+                }
+              >
+                <span className="visually-hidden">Управление каналом</span>
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                <Dropdown.Item
+                  as="button"
+                  onClick={() => handleChannelDropdown(channel, 'removeChannel')}
+                >
+                  {t('mainPage.delete')}
+                </Dropdown.Item>
+                <Dropdown.Item
+                  as="button"
+                  onClick={() => handleChannelDropdown(channel, 'renameChannel')}
+                >
+                  {t('mainPage.rename')}
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          ) : (
             <Button
+              onClick={() => handleClick(channel)}
               type="button"
-              variant="secondary"
-              onClick={handleCloseRemoveModal}
-              className="me-2"
+              variant={channel.id === currentChannel.id ? 'secondary' : 'light'}
+              className="w-100 rounded-0 text-start"
             >
-              {t('mainPage.cancel')}
+              <span className="me-1"># </span>
+              {channel.name}
             </Button>
-            <Button
-              type="button"
-              autoFocus
-              variant="danger"
-              onClick={handleRemoveChannel}
-              ref={deleteButtonRef}
-            >
-              {t('mainPage.delete')}
-            </Button>
-          </div>
-        </Modal.Body>
-      </Modal>
-      <Modal show={showRenameModal} onHide={handleCloseRenameModal} centered>
-        <Formik
-          initialValues={{
-            channelName: selectedChannel ? selectedChannel.name : '',
-          }}
-          validationSchema={RenameChannelSchema}
-          onSubmit={async ({ channelName: name }) => {
-            try {
-              const response = await axios.patch(
-                routes.channelsPath(
-                  selectedChannel ? selectedChannel.id : null,
-                ),
-                { name },
-                {
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                  },
-                },
-              );
-              handleCloseRenameModal();
-              toast.success(t('notification.successRename'));
-            } catch (error) {
-              toast(error.message);
-            }
-          }}
-        >
-          {({
-            isSubmitting, errors, touched, handleSubmit,
-          }) => (
-            <Form onSubmit={handleSubmit}>
-              <Modal.Header closeButton>
-                <Modal.Title>{t('mainPage.renameChannel')}</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <Field
-                  id="channelName"
-                  name="channelName"
-                  className={`form-control ${
-                    errors.channelName && touched.channelName
-                      ? 'is-invalid'
-                      : ''
-                  }`}
-                  validateOnBlur
-                  innerRef={renameInputRef}
-                />
-                <label className="visually-hidden" htmlFor="channelName">
-                  {t('mainPage.channelName')}
-                </label>
-                {errors.channelName && touched.channelName ? (
-                  <BootstrapForm.Control.Feedback
-                    type="invalid"
-                    className="d-block"
-                  >
-                    {errors.channelName}
-                  </BootstrapForm.Control.Feedback>
-                ) : null}
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={handleCloseRenameModal}>
-                  Отменить
-                </Button>
-                <Button type="submit" variant="primary" disabled={isSubmitting}>
-                  {isSubmitting ? 'Отправка...' : 'Отправить'}
-                </Button>
-              </Modal.Footer>
-            </Form>
           )}
-        </Formik>
-      </Modal>
-    </>
+        </Nav.Item>
+      ))}
+    </Nav>
   );
 };
 
@@ -369,7 +192,12 @@ const MessageForm = () => {
           onChange={(e) => setInputValue(e.target.value)}
         />
         <button className="btn btn-group-vertical" type="submit">
-          <img src={sendMessageButton} alt="sendButtonMessage" width="20" height="20"/>
+          <img
+            src={sendMessageButton}
+            alt="sendButtonMessage"
+            width="20"
+            height="20"
+          />
           <span className="visually-hidden">Отправить</span>
         </button>
       </BootstrapForm.Group>
@@ -380,120 +208,27 @@ const MessageForm = () => {
 
 const NewChannelButton = () => {
   const dispatch = useDispatch();
-  const newChannelFieldRef = useRef(null);
-  const { t } = useTranslation();
-
-  const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-  const { auth, channels } = useSelector((state) => state);
-  const cleanWords = useFilter();
-
-  const NewChannelSchema = Yup.object().shape({
-    channelName: Yup.string()
-      .min(3, t('validation.channelNameMinMax'))
-      .max(20, t('validation.channelNameMinMax'))
-      .required(t('validation.required'))
-      .notOneOf(
-        channels.list.map((channel) => channel.name),
-        t('validation.unique'),
-      ),
-  });
-
-  useEffect(() => {
-    if (show && newChannelFieldRef.current) {
-      newChannelFieldRef.current.focus();
-    }
-  }, [show]);
 
   return (
-    <>
-      <button
-        type="button"
-        className="p-0 text-primary btn btn-group-vertical"
-        onClick={() => dispatch(showModal('addingChannel'))}
-      >
-        <img src={addChannelButton} alt="addChannelButton" width="20" height="20" />
-        <span className="visually-hidden">+</span>
-      </button>
-
-      <Modal show={show} onHide={handleClose} centered>
-        <Formik
-          initialValues={{
-            channelName: '',
-          }}
-          validationSchema={NewChannelSchema}
-          onSubmit={async ({ channelName }) => {
-            try {
-              const name = cleanWords(channelName);
-              const response = await axios.post(
-                routes.channelsPath(),
-                { name },
-                {
-                  headers: {
-                    Authorization: `Bearer ${auth.token}`,
-                  },
-                },
-              );
-              const [newChannel] = [...channels.list].reverse();
-              dispatch(setCurrentChannel(response.data));
-              handleClose();
-              toast.success(t('notification.successCreate'));
-            } catch (error) {
-              toast.error(error.message);
-            }
-          }}
-        >
-          {({
-            isSubmitting, errors, touched, handleSubmit,
-          }) => (
-            <Form onSubmit={handleSubmit}>
-              <Modal.Header closeButton>
-                <Modal.Title>{t('mainPage.addChannel')}</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <Field
-                  id="channelName"
-                  name="channelName"
-                  className={`form-control ${
-                    errors.channelName && touched.channelName
-                      ? 'is-invalid'
-                      : ''
-                  }`}
-                  validateOnBlur
-                  innerRef={newChannelFieldRef}
-                />
-                <label className="visually-hidden" htmlFor="channelName">
-                  {t('mainPage.channelName')}
-                </label>
-                {errors.channelName && touched.channelName ? (
-                  <BootstrapForm.Control.Feedback
-                    type="invalid"
-                    className="d-block"
-                  >
-                    {errors.channelName}
-                  </BootstrapForm.Control.Feedback>
-                ) : null}
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
-                  Отменить
-                </Button>
-                <Button type="submit" variant="primary" disabled={isSubmitting}>
-                  {isSubmitting ? 'Отправка...' : 'Отправить'}
-                </Button>
-              </Modal.Footer>
-            </Form>
-          )}
-        </Formik>
-      </Modal>
-    </>
+    <button
+      type="button"
+      className="p-0 text-primary btn btn-group-vertical"
+      onClick={() => dispatch(showModal('addChannel'))}
+    >
+      <img
+        src={addChannelButton}
+        alt="addChannelButton"
+        width="20"
+        height="20"
+      />
+      <span className="visually-hidden">+</span>
+    </button>
   );
 };
 
 const MainPage = () => {
   const dispatch = useDispatch();
-  const { auth } = useSelector((state) => state);
+  const { auth, channels, messages } = useSelector((state) => state);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -525,10 +260,6 @@ const MainPage = () => {
 
     fetchData();
   }, [auth.token, dispatch]);
-
-  const { channels, messages } = useSelector((state) => {
-    return state;
-  });
 
   const currentChannel = useSelector((state) => state.channels.currentChannel);
   const currentChannelName = currentChannel
