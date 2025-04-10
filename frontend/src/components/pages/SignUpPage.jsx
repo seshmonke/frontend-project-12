@@ -131,7 +131,7 @@ const SignUpPage = () => {
                 <img
                   src={signUpImage}
                   className="rounded-circle h-50"
-                  alt="Регистрация"
+                  alt={t('signUpPage.registration')}
                 />
               </div>
               <Formik

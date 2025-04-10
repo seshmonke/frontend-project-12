@@ -13,6 +13,7 @@ export default {
       renameChannel: 'Переименовать канал',
       areYouSure: 'Уверены?', //
       cancel: 'Отменить', //
+      controlChannel: 'Управление каналом',
       messages: '{{count}} сообщение', // Базовый ключ
       messages_plural: '{{count}} сообщения', // Множественная форма
       messages_few: '{{count}} сообщения', // Форма для нескольких
@@ -32,6 +33,11 @@ export default {
       confirmPassword: 'Подтвердите пароль',
       registration: 'Зарегистрироваться',
       sending: 'Отправка...',
+    },
+    notFoundPage: {
+      notFound: 'Страница не найдена',
+      youCanGoTo: 'Но вы можете перейти',
+      goToMainPage: ' на главную страницу',
     },
     validation: {
       channelNameMinMax: 'От 3 до 20 символов',

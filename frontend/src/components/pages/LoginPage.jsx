@@ -65,7 +65,7 @@ const LoginForm = () => {
             type="text"
             name="username"
             autocomplete="username"
-            placeholder="Ваш ник"
+            placeholder={t('loginPage.yourName')}
             required
             id="username"
             className={`form-control ${authError && 'is-invalid'}`}
@@ -78,7 +78,7 @@ const LoginForm = () => {
             type="password"
             name="password"
             autocomplete="username"
-            placeholder="Пароль"
+            placeholder={t('loginPage.yourPassword')}
             required
             id="password"
             className={`form-control ${authError && 'is-invalid'}`}
@@ -89,7 +89,7 @@ const LoginForm = () => {
           </BootstrapForm.Control.Feedback>
         </div>
         <Button variant="primary" type="submit" className="w-100 mb-3">
-          Войти
+          {t('loginPage.title')}
         </Button>
       </Form>
     </Formik>
@@ -107,7 +107,7 @@ const LoginPage = () => {
               <div className="col-12 col-md-6 d-flex align-items-center justify-content-center">
                 <img
                   src={loginImage}
-                  alt="Войти"
+                  alt={t('loginPage.title')}
                   className="rounded-circle h-50"
                 />
               </div>

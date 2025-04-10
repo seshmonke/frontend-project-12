@@ -71,7 +71,7 @@ const Channels = ({ channels }) => {
                   channel.id === currentChannel.id ? 'secondary' : 'light'
                 }
               >
-                <span className="visually-hidden">Управление каналом</span>
+                <span className="visually-hidden">{t('mainPage.controlChannel')}</span>
               </Dropdown.Toggle>
 
               <Dropdown.Menu>
@@ -198,7 +198,7 @@ const MessageForm = () => {
             width="20"
             height="20"
           />
-          <span className="visually-hidden">Отправить</span>
+          <span className="visually-hidden">{t('mainPage.send')}</span>
         </button>
       </BootstrapForm.Group>
       {errorMessage && <div className="text-danger">{errorMessage}</div>}
