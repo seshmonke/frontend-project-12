@@ -1,7 +1,7 @@
 export default {
   translation: {
     logoutButton: 'Выйти',
-    title: 'Hexlet Chat',
+    title: 'Sesh Chat',
     mainPage: {
       channelName: 'Имя канала',
       channels: 'Каналы',
